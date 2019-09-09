@@ -39,8 +39,17 @@ func (conn *db) SelectSliceRow(stmt Stmt, mapper SliceMapper) (rowsReturned int,
 	return conn.runSliceRow(stmt, mapper)
 }
 
-func (conn *db) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return nil, nil
+// Exec run a statement.
+func (conn *db) Exec(stmt Stmt) (sql.Result, error) {
+	if err := conn.Connect(); err != nil {
+		return nil, err
+	}
+
+	if conn.tx != nil {
+		return conn.tx.Exec(stmt.String(), stmt.Args()...)
+	}
+
+	return (*conn.dbx).Exec(stmt.String(), stmt.Args()...)
 }
 
 // QueryMap

@@ -46,6 +46,10 @@ type Connection interface {
 	MustPing()
 	Close() error
 
+	// Statements
+	Exec(Stmt) (sql.Result, error)
+
+	// Queries
 	SelectMap(Stmt, MapMapper) (int, error)
 	SelectSlice(Stmt, SliceMapper) (int, error)
 	SelectMapRow(Stmt, MapMapper) (int, error)
