@@ -10,6 +10,13 @@ import (
 	"strings"
 )
 
+// ParseColumns create a new Columns based on a string(s) input.
+// This function should be called to initiate the Columns field.
+func ParseColumns(cols ...string) (out Columns) {
+	out.Add(cols...)
+	return
+}
+
 // Columns is list of columns.
 type Columns struct {
 	str strings.Builder
