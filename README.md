@@ -73,21 +73,40 @@ func main() {
     // Mapping through a map
     // (faster than structscan if you look for performance)
     out := []User{}
-    db.SelectMap(s, func(values map[string]interface{}){
+    db.SelectMap(&s, func(values map[string]interface{}){
         out = append(out, User{
             ID:   values["id"].(int64),
-            Name: string(values["name"]),
+            Name: string(values["name"].([]byte)),
         })
     })
 
     // More faster than previous one.
     out2 := []User{}
-    db.SelectSlice(s, func(values []interface{}) {
-        out = append(out, User{
+    db.SelectSlice(&s, func(values []interface{}) {
+        out2 = append(out2, User{
             ID:   values[0].(int64),
-            Name: string(values[1]),
+            Name: string(values[1].([]byte)),
         })
     })
+
+    // Using raw query
+    out3 := []User{}
+    db.QuerySlice(builder.NewQuery("SELECT * FROM users WHERE id < ?", 10), func(values []interface{}) {
+        out3 = append(out3, User{
+            // ...
+        })
+    })
+
+    // Using upsert
+    i := builder.Insert{
+        Table: "users",
+        Values: builder.H{
+            "id": 1,
+            "name": "John",
+        },
+        OnUpdateKeys: builder.Keys{"name"},
+    }
+    db.Exec(&i)
 }
 ```
 
@@ -110,3 +129,86 @@ func main() {
 ## ➡ transactions
 
 ## ➡ profiling & context
+
+## ➡ statements
+
+### Select
+
+
+#### Map
+
+#### Slice
+
+### Exec
+
+#### Insert
+```go
+// Example of Insert
+i := builder.Insert{
+    Table:           "users",
+    IgnoreMode:      false, // False by default
+    Values:          builder.H{
+        "name": "John",
+    },
+}
+
+println(i.String()) // INSERT INTO users(name) VALUES(?) 
+
+r, err := db.Exec(&i)
+```
+
+#### Upsert
+
+```go
+// Example of Insert with upsert mode.
+i := builder.Insert{
+    Table:           "users",
+    Values:          builder.H{
+        "id": 15,
+        "name": "John",
+    },
+    OnUpdateKeys:    builder.Keys{"name"},
+}
+
+println(i.String()) // INSERT INTO users(id, name) VALUES(?, ?) 
+                    // ON DUPLICATE KEY UPDATE name = VALUES(name) 
+
+r, err := db.Exec(&i)
+```
+
+#### Update
+
+```go
+// Example of Update
+u := builder.Update{
+    Table:           "users",
+    Values:          builder.H{
+        "name": "John",
+    },
+    Where: builder.ParseWhere("id = ?", 1) // Used to initiate the value (if needed)
+}
+
+// You can also use where like following :
+// i.Where.And("id = ?", 1)
+
+println(u.String()) // UPDATE users SET name = ? WHERE id = ?
+
+r, err := db.Exec(&u)
+```
+
+#### Delete
+
+```go
+// Example of Delete
+d := builder.Delete{
+    Table:           "users",
+    Where: builder.ParseWhere("id = ?", 1) // Used to initiate the value (if needed)
+}
+
+// You can also use where like following :
+// i.Where.And("id = ?", 1)
+
+println(d.String()) // DELETE FROM users WHERE id = ?
+
+r, err := db.Exec(&d)
+```
