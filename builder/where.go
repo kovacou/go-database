@@ -44,17 +44,17 @@ type Where struct {
 	args []interface{}
 }
 
-// Args
+// Args return the arguments of the where.
 func (w *Where) Args() []interface{} {
 	return w.args
 }
 
-// String
+// String convert Where to string.
 func (w *Where) String() string {
 	return w.str.String()
 }
 
-// And
+// And add a new condition "AND".
 func (w *Where) And(str string, args ...interface{}) *Where {
 	if w.str.Len() > 0 {
 		w.str.WriteString(andKeyword)
@@ -65,7 +65,7 @@ func (w *Where) And(str string, args ...interface{}) *Where {
 	return w
 }
 
-// AndIn
+// AndIn add a new condition "AND" with the operator IN.
 func (w *Where) AndIn(col string, s Slicer) *Where {
 	if n := s.Len(); n > 0 {
 		w.And(whereIn(col, inKeyword, s), s.S()...)
@@ -73,7 +73,7 @@ func (w *Where) AndIn(col string, s Slicer) *Where {
 	return w
 }
 
-// AndNotIn
+// AndNotIn add a new condition "AND" with the operator NOT IN.
 func (w *Where) AndNotIn(col string, s Slicer) *Where {
 	if n := s.Len(); n > 0 {
 		w.And(whereIn(col, notInKeyword, s), s.S()...)
@@ -81,7 +81,8 @@ func (w *Where) AndNotIn(col string, s Slicer) *Where {
 	return w
 }
 
-// AndWhere
+// AndWhere merge Where's inside parenthesis with AND condition.
+// AND ( where )
 func (w *Where) AndWhere(in ...Where) *Where {
 	for _, v := range in {
 		if v.str.Len() > 0 {
@@ -91,7 +92,7 @@ func (w *Where) AndWhere(in ...Where) *Where {
 	return w
 }
 
-// Or
+// Or add a new condition "OR".
 func (w *Where) Or(str string, args ...interface{}) *Where {
 	if w.str.Len() > 0 {
 		w.str.WriteString(orKeyword)
@@ -102,7 +103,7 @@ func (w *Where) Or(str string, args ...interface{}) *Where {
 	return w
 }
 
-// OrIn
+// OrIn add a new condition "OR" with the operator IN.
 func (w *Where) OrIn(col string, s Slicer) *Where {
 	if n := s.Len(); n > 0 {
 		w.Or(whereIn(col, inKeyword, s), s.S()...)
@@ -110,7 +111,7 @@ func (w *Where) OrIn(col string, s Slicer) *Where {
 	return w
 }
 
-// OrNotIn
+// OrNotIn add a new condition "OR" with the operator NOT IN.
 func (w *Where) OrNotIn(col string, s Slicer) *Where {
 	if n := s.Len(); n > 0 {
 		w.Or(whereIn(col, notInKeyword, s), s.S()...)
@@ -118,7 +119,8 @@ func (w *Where) OrNotIn(col string, s Slicer) *Where {
 	return w
 }
 
-// OrWhere
+// OrWhere merge Where's inside parenthesis with OR condition.
+// OR ( where )
 func (w *Where) OrWhere(in ...Where) *Where {
 	for _, v := range in {
 		if v.str.Len() > 0 {
