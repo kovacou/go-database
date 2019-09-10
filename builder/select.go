@@ -23,6 +23,7 @@ type Select struct {
 	Where   Where
 	Having  Having
 	GroupBy GroupBy
+	OrderBy OrderBy
 	Limit   int
 	Offset  int
 }
@@ -56,6 +57,12 @@ func (s *Select) String() string {
 	if s.GroupBy.str.Len() > 0 {
 		q.WriteString(groupByKeyword)
 		q.WriteString(s.GroupBy.str.String())
+	}
+
+	// OrderBy clause
+	if s.OrderBy.str.Len() > 0 {
+		q.WriteString(orderByKeyword)
+		q.WriteString(s.OrderBy.str.String())
 	}
 
 	// Pagination
