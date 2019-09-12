@@ -139,14 +139,20 @@ func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, 
 
 	conn.id, conn.dbx = createNewConnection()
 	if conn.hasVerbose() {
-		if len(logger) > 0 {
-			conn.log = logger[0]
+		if n := len(logger); n > 0 {
+			conn.logOut = logger[0]
+
+			if n > 1 {
+				conn.logErr = logger[1]
+			}
 		} else {
-			conn.log = log.New(os.Stdout, fmt.Sprintf("(%s:%s) ", conn.env.Driver, conn.env.Alias), 0)
+			prefix := fmt.Sprintf("(%s:%s) ", conn.env.Driver, conn.env.Alias)
+			conn.logOut = log.New(os.Stdout, prefix, 0)
+			conn.logErr = log.New(os.Stderr, prefix, 0)
 		}
 
 		if conn.env.DSN == "" {
-			conn.log.Printf(
+			conn.logOut.Printf(
 				"%s@%s:%s[%s] configured and ready",
 				conn.env.User,
 				conn.env.Host,

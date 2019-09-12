@@ -15,12 +15,13 @@ import (
 
 // db is a wrapper around sqlx.DB.
 type db struct {
-	id  uint
-	dbx **sqlx.DB
-	tx  *sqlx.Tx
-	m   *sync.Mutex
-	log *log.Logger
-	err error
+	id     uint
+	dbx    **sqlx.DB
+	tx     *sqlx.Tx
+	m      *sync.Mutex
+	logOut *log.Logger
+	logErr *log.Logger
+	err    error
 
 	ctx      Context
 	env      Environment
@@ -40,7 +41,7 @@ func (conn *db) copy() *db {
 // SetLogger set a new logger to the db.
 func (conn *db) SetLogger(log *log.Logger) {
 	if log != nil {
-		conn.log = log
+		conn.logOut = log
 	}
 }
 
@@ -124,7 +125,7 @@ func (conn *db) Connect() (err error) {
 	dbx.SetConnMaxLifetime(conn.env.MaxLifetime)
 
 	if conn.hasVerbose() {
-		conn.log.Printf("connected")
+		conn.logOut.Printf("connected")
 	}
 
 	return

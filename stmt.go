@@ -93,7 +93,7 @@ func (conn *db) runMap(stmt Stmt, mapper MapMapper) (rowsReturned int, err error
 		}
 	}
 	if err != nil && conn.hasVerbose() {
-		conn.log.Println(err.Error())
+		conn.logErr.Println(err.Error())
 	}
 
 	return
@@ -122,7 +122,7 @@ func (conn *db) runMapRow(stmt Stmt, mapper MapMapper) (rowsReturned int, err er
 	}
 
 	if err != nil && conn.hasVerbose() {
-		conn.log.Println(err.Error())
+		conn.logErr.Println(err.Error())
 	}
 
 	return
@@ -159,7 +159,7 @@ func (conn *db) runSlice(stmt Stmt, mapper SliceMapper) (rowsReturned int, err e
 	}
 
 	if err != nil && conn.hasVerbose() {
-		conn.log.Println(err.Error())
+		conn.logErr.Println(err.Error())
 	}
 
 	return
@@ -186,7 +186,7 @@ func (conn *db) runSliceRow(stmt Stmt, mapper SliceMapper) (rowsReturned int, er
 	}
 
 	if err != nil && conn.hasVerbose() {
-		conn.log.Println(err.Error())
+		conn.logErr.Println(err.Error())
 	}
 
 	return
