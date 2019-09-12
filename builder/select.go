@@ -47,16 +47,16 @@ func (s *Select) String() string {
 		q.WriteString(s.Where.str.String())
 	}
 
-	// Having clause
-	if s.Having.str.Len() > 0 {
-		q.WriteString(havingKeyword)
-		q.WriteString(s.Having.str.String())
-	}
-
 	// Group By clause
 	if s.GroupBy.str.Len() > 0 {
 		q.WriteString(groupByKeyword)
 		q.WriteString(s.GroupBy.str.String())
+	}
+
+	// Having clause
+	if s.Having.str.Len() > 0 {
+		q.WriteString(havingKeyword)
+		q.WriteString(s.Having.str.String())
 	}
 
 	// OrderBy clause
