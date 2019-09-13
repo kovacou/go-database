@@ -16,10 +16,12 @@ import (
 )
 
 var (
-	// Verbose is a global mode, when set at true, it will override the configuration of connections.
+	// Verbose is a global mode, when set at true, it will override the
+	// configuration of the connections.
 	Verbose bool
 
-	// Debug is a global mode, when set at true, it will override the configuration of connections.
+	// Debug is a global mode, when set at true, it will override the
+	// configuration of the connections.
 	Debug bool
 
 	// m is the mutex the manage the pool of sqlx wrapper.
@@ -37,7 +39,6 @@ type SliceMapper func([]interface{})
 
 // Connection is a connection to an database.
 type Connection interface {
-	SetLogger(*log.Logger)
 	DB() *sqlx.DB
 	Copy() Connection
 	Connect() error
@@ -45,6 +46,7 @@ type Connection interface {
 	Ping() error
 	MustPing()
 	Close() error
+	SetLogger(out *log.Logger, err *log.Logger)
 
 	// Statements
 	Exec(Stmt) (sql.Result, error)
@@ -104,18 +106,22 @@ func OpenEnviron(e Environment, logger ...*log.Logger) (Connection, error) {
 
 // -------------------------------------------------
 
+// openEnv open a new connection through environment variables.
 func openEnv(env string, logger []*log.Logger) (*db, error) {
 	return open(nil, env, nil, logger)
 }
 
+// openEnviron open a new connection with a given Environ.
 func openEnviron(e Environment, logger []*log.Logger) (*db, error) {
 	return open(&e, "", nil, logger)
 }
 
+// openWith open a new connection with a given sqlx.DB connection.
 func openWith(dbx *sqlx.DB, logger []*log.Logger) (*db, error) {
 	return open(nil, "", dbx, logger)
 }
 
+// open a new connection based on input.
 func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, error) {
 	var cfg Environment
 
@@ -146,9 +152,14 @@ func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, 
 				conn.logErr = logger[1]
 			}
 		} else {
-			prefix := fmt.Sprintf("(%s:%s) ", conn.env.Driver, conn.env.Alias)
-			conn.logOut = log.New(os.Stdout, prefix, 0)
-			conn.logErr = log.New(os.Stderr, prefix, 0)
+			prefix := fmt.Sprintf(
+				"(\033[95;1m%s\033[0m:\033[4m%s\033[0m)",
+				conn.env.Driver,
+				conn.env.Alias,
+			)
+
+			conn.logOut = log.New(os.Stdout, fmt.Sprintf("%s ➜ ", prefix), 0)
+			conn.logErr = log.New(os.Stderr, fmt.Sprintf("%s \033[91m➜ ", prefix), 0)
 		}
 
 		if conn.env.DSN == "" {
@@ -165,6 +176,7 @@ func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, 
 	return conn, nil
 }
 
+// createNewConnection in the pool "cp".
 func createNewConnection(dbx ...*sqlx.DB) (uint, **sqlx.DB) {
 	m.Lock()
 	cid := uint(len(cp))

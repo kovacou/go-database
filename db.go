@@ -39,9 +39,13 @@ func (conn *db) copy() *db {
 }
 
 // SetLogger set a new logger to the db.
-func (conn *db) SetLogger(log *log.Logger) {
-	if log != nil {
-		conn.logOut = log
+func (conn *db) SetLogger(out *log.Logger, err *log.Logger) {
+	if out != nil {
+		conn.logOut = out
+	}
+
+	if err != nil {
+		conn.logErr = err
 	}
 }
 
