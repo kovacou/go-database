@@ -1,5 +1,7 @@
 # go-database
 
+Personal project.  
+
 `go-database` is a library made for `mysql` which provides a set of extensions on top of [`jmoiron/sqlx`](https://github.com/jmoiron/sqlx) such as a querybuilder, profiler, context & transactions for performances. **This is not an ORM**.
 
 ## ➡ features
@@ -145,9 +147,9 @@ func main() {
 ```go
 // Example of Insert
 i := builder.Insert{
-    Table:           "users",
-    IgnoreMode:      false, // False by default
-    Values:          builder.H{
+    Table:      "users",
+    IgnoreMode: false, // False by default
+    Values:     builder.H{
         "name": "John",
     },
 }
@@ -162,12 +164,12 @@ r, err := db.Exec(&i)
 ```go
 // Example of Insert with upsert mode.
 i := builder.Insert{
-    Table:           "users",
-    Values:          builder.H{
+    Table:        "users",
+    Values:       builder.H{
         "id": 15,
         "name": "John",
     },
-    OnUpdateKeys:    builder.Keys{"name"},
+    OnUpdateKeys: builder.Keys{"name"},
 }
 
 println(i.String()) // INSERT INTO users(id, name) VALUES(?, ?) 
@@ -181,15 +183,15 @@ r, err := db.Exec(&i)
 ```go
 // Example of Update
 u := builder.Update{
-    Table:           "users",
-    Values:          builder.H{
+    Table:  "users",
+    Values: builder.H{
         "name": "John",
     },
     Where: builder.ParseWhere("id = ?", 1) // Used to initiate the value (if needed)
 }
 
 // You can also use where like following :
-// i.Where.And("id = ?", 1)
+// u.Where.And("id = ?", 1)
 
 println(u.String()) // UPDATE users SET name = ? WHERE id = ?
 
@@ -201,12 +203,12 @@ r, err := db.Exec(&u)
 ```go
 // Example of Delete
 d := builder.Delete{
-    Table:           "users",
+    Table: "users",
     Where: builder.ParseWhere("id = ?", 1) // Used to initiate the value (if needed)
 }
 
 // You can also use where like following :
-// i.Where.And("id = ?", 1)
+// d.Where.And("id = ?", 1)
 
 println(d.String()) // DELETE FROM users WHERE id = ?
 
