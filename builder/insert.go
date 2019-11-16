@@ -7,7 +7,6 @@ package builder
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 )
 
@@ -19,30 +18,12 @@ const (
 	onDuplicateKeyUpdateKeyword = " ON DUPLICATE KEY UPDATE "
 )
 
-// Values is the representation of an insert or update values.
-type Values map[string]interface{}
-
-// Keys is a slice of string representing a list of key.
-type Keys []string
-
-// RawKeys is used to map keys to expression (On Duplicate Key Update case).
-type RawKeys map[string]string
-
-// Keys return sorted keys of the values.
-func (v Values) Keys() Keys {
-	keys := make(Keys, 0, len(v))
-	for k := range v {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys
-}
-
 // Insert is the representation of an Insert statement.
 type Insert struct {
 	Table           string
+	Select          Select
 	IgnoreMode      bool
-	Values          Values
+	Values          H
 	keys            Keys
 	OnUpdateKeys    Keys
 	OnUpdateRawKeys RawKeys
@@ -57,11 +38,12 @@ func (i *Insert) String() string {
 		q.WriteString(ignoreKeyword)
 	}
 
+	keys := i.Values.Keys()
+	n := len(keys)
+
 	q.WriteString(intoKeyword)
 	q.WriteString(i.Table)
 	q.WriteRune('(')
-	keys := i.Values.Keys()
-	n := len(keys)
 	q.WriteString(strings.Join(keys, ","))
 	q.WriteRune(')')
 	q.WriteString(valuesKeyword)
@@ -71,14 +53,26 @@ func (i *Insert) String() string {
 
 	if len(i.OnUpdateKeys) > 0 || len(i.OnUpdateRawKeys) > 0 {
 		q.WriteString(onDuplicateKeyUpdateKeyword)
+		first := true
+
 		for _, k := range i.OnUpdateKeys {
+			if !first {
+				q.WriteRune(',')
+			} else {
+				first = false
+			}
+
 			fmt.Fprintf(&q, "%s = VALUES(%s)", k, k)
 		}
 
-		if i.OnUpdateRawKeys != nil {
-			for key, exp := range i.OnUpdateRawKeys {
-				fmt.Fprintf(&q, "%s = %s", key, exp)
+		for key, exp := range i.OnUpdateRawKeys {
+			if !first {
+				q.WriteRune(',')
+			} else {
+				first = false
 			}
+
+			fmt.Fprintf(&q, "%s = %s", key, exp)
 		}
 	}
 	return q.String()
