@@ -23,10 +23,11 @@ type Context interface {
 	Len() int
 	Flush()
 	Err() error
+	Push(QueryState) bool
 }
 
-// newContext
-func newContext(f []string) Context {
+// newContext create a new context.
+func newContext(f []string) *ctx {
 	ctx := &ctx{
 		flag:  f,
 		store: make(chan QueryState, 1),
@@ -136,8 +137,8 @@ func (conn *db) Done() {
 	if conn.HasContext() {
 		conn.ctx.Done()
 
-		// if conn.HasProfiling() {
-		// 	conn.Profile()
-		// }
+		if conn.hasProfiling() {
+			// 	conn.Profile()
+		}
 	}
 }

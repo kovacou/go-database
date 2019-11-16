@@ -159,7 +159,7 @@ func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, 
 			)
 
 			conn.logOut = log.New(os.Stdout, fmt.Sprintf("%s ➜ ", prefix), 0)
-			conn.logErr = log.New(os.Stderr, fmt.Sprintf("%s \033[91m➜ ", prefix), 0)
+			conn.logErr = log.New(os.Stderr, fmt.Sprintf("%s \033[91m➜ \033[1mERROR: \033[0m ", prefix), 0)
 		}
 
 		if conn.env.DSN == "" {

@@ -7,6 +7,7 @@ package database
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kovacou/go-database/builder"
@@ -15,7 +16,6 @@ import (
 // Stmt is the representation of an statement or query (SELECT, UPDATE, & DELETE)
 type Stmt interface {
 	String() string
-	//Bytes() []byte
 	Args() []interface{}
 }
 
@@ -40,16 +40,24 @@ func (conn *db) SelectSliceRow(stmt Stmt, mapper SliceMapper) (rowsReturned int,
 }
 
 // Exec run a statement.
-func (conn *db) Exec(stmt Stmt) (sql.Result, error) {
+func (conn *db) Exec(stmt Stmt) (res sql.Result, err error) {
 	if err := conn.Connect(); err != nil {
 		return nil, err
 	}
 
-	if conn.tx != nil {
-		return conn.tx.Exec(stmt.String(), stmt.Args()...)
+	var t time.Time
+	if conn.hasProfiling() {
+		t = time.Now()
 	}
 
-	return (*conn.dbx).Exec(stmt.String(), stmt.Args()...)
+	if conn.tx != nil {
+		res, err = conn.tx.Exec(stmt.String(), stmt.Args()...)
+	} else {
+		res, err = (*conn.dbx).Exec(stmt.String(), stmt.Args()...)
+	}
+
+	conn.profilingStmt(stmt, err, t)
+	return
 }
 
 // QueryMap
@@ -71,10 +79,14 @@ func (conn *db) runMap(stmt Stmt, mapper MapMapper) (rowsReturned int, err error
 	var (
 		stmtx *sqlx.Stmt
 		rows  *sqlx.Rows
+		t     time.Time
 	)
 
-	stmtx, err = preparex(conn, stmt)
+	if conn.hasProfiling() {
+		t = time.Now()
+	}
 
+	stmtx, err = preparex(conn, stmt)
 	if err == nil {
 		defer stmtx.Close()
 		rows, err = stmtx.Queryx(stmt.Args()...)
@@ -92,10 +104,12 @@ func (conn *db) runMap(stmt Stmt, mapper MapMapper) (rowsReturned int, err error
 			}
 		}
 	}
+
 	if err != nil && conn.hasVerbose() {
 		conn.logErr.Println(err.Error())
 	}
 
+	conn.profilingStmt(stmt, err, t)
 	return
 }
 
@@ -108,7 +122,12 @@ func (conn *db) runMapRow(stmt Stmt, mapper MapMapper) (rowsReturned int, err er
 	var (
 		stmtx  *sqlx.Stmt
 		values map[string]interface{}
+		t      time.Time
 	)
+
+	if conn.hasProfiling() {
+		t = time.Now()
+	}
 
 	stmtx, err = preparex(conn, stmt)
 	if err == nil {
@@ -125,6 +144,7 @@ func (conn *db) runMapRow(stmt Stmt, mapper MapMapper) (rowsReturned int, err er
 		conn.logErr.Println(err.Error())
 	}
 
+	conn.profilingStmt(stmt, err, t)
 	return
 }
 
@@ -138,7 +158,12 @@ func (conn *db) runSlice(stmt Stmt, mapper SliceMapper) (rowsReturned int, err e
 		stmtx  *sqlx.Stmt
 		rows   *sqlx.Rows
 		values []interface{}
+		t      time.Time
 	)
+
+	if conn.hasProfiling() {
+		t = time.Now()
+	}
 
 	stmtx, err = preparex(conn, stmt)
 	if err == nil {
@@ -162,6 +187,7 @@ func (conn *db) runSlice(stmt Stmt, mapper SliceMapper) (rowsReturned int, err e
 		conn.logErr.Println(err.Error())
 	}
 
+	conn.profilingStmt(stmt, err, t)
 	return
 }
 
@@ -174,7 +200,12 @@ func (conn *db) runSliceRow(stmt Stmt, mapper SliceMapper) (rowsReturned int, er
 	var (
 		stmtx  *sqlx.Stmt
 		values []interface{}
+		t      time.Time
 	)
+
+	if conn.hasProfiling() {
+		t = time.Now()
+	}
 
 	stmtx, err = preparex(conn, stmt)
 	if err == nil {
@@ -189,6 +220,7 @@ func (conn *db) runSliceRow(stmt Stmt, mapper SliceMapper) (rowsReturned int, er
 		conn.logErr.Println(err.Error())
 	}
 
+	conn.profilingStmt(stmt, err, t)
 	return
 }
 
@@ -199,4 +231,23 @@ func preparex(conn *db, stmt Stmt) (*sqlx.Stmt, error) {
 	}
 
 	return (*conn.dbx).Preparex(stmt.String())
+}
+
+// profilingStmt store into the context the Stmt and store
+func (conn *db) profilingStmt(stmt Stmt, err error, t time.Time) {
+	if !conn.hasProfiling() {
+		return
+	}
+
+	qs := &qs{
+		query:   stmt.String(),
+		args:    stmt.Args(),
+		ctxID:   conn.ctx.id,
+		ctxFlag: conn.ctx.flag,
+		start:   t,
+		end:     time.Now(),
+	}
+
+	conn.ctx.Push(qs)
+	conn.profiler.Push(qs)
 }

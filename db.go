@@ -23,9 +23,9 @@ type db struct {
 	logErr *log.Logger
 	err    error
 
-	ctx      Context
+	ctx      *ctx
 	env      Environment
-	profiler Profiler
+	profiler *profiler
 }
 
 // Copy the current connection.
@@ -59,6 +59,11 @@ func (conn *db) hasVerbose() bool {
 	return Verbose || conn.env.Verbose
 }
 
+// hasProfiling says if the connection have a profiler attached.
+func (conn *db) hasProfiling() bool {
+	return conn.profiler != nil
+}
+
 // DB return the unwrapped sqlx.DB.
 func (conn *db) DB() *sqlx.DB {
 	conn.Connect()
@@ -72,7 +77,7 @@ func (conn *db) Close() (err error) {
 	}
 
 	if conn.profiler != nil {
-		conn.profiler.Close()
+		conn.profiler.close()
 	}
 
 	if dbx := (*conn.dbx); dbx != nil {
@@ -127,6 +132,13 @@ func (conn *db) Connect() (err error) {
 	dbx.SetMaxIdleConns(conn.env.MaxIdle)
 	dbx.SetMaxOpenConns(conn.env.MaxOpen)
 	dbx.SetConnMaxLifetime(conn.env.MaxLifetime)
+
+	if conn.env.ProfilerEnable {
+		conn.m.Lock()
+		conn.ctx = newContext(nil)
+		conn.profiler = newProfiler(conn.env.ProfilerOutput)
+		conn.m.Unlock()
+	}
 
 	if conn.hasVerbose() {
 		conn.logOut.Printf("connected")

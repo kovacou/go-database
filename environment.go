@@ -8,7 +8,6 @@ package database
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -32,22 +31,24 @@ type Environment struct {
 	Alias string
 	DSN   string `env:"DATABASE_DSN"`
 
-	Driver      string        `env:"DATABASE_DRIVER"`
-	Protocol    string        `env:"DATABASE_PROTOCOL"`
-	Host        string        `env:"DATABASE_HOST"`
-	Port        string        `env:"DATABASE_PORT"`
-	User        string        `env:"DATABASE_USER"`
-	Pass        string        `env:"DATABASE_PASS"`
-	Charset     string        `env:"DATABASE_CHARSET"`
-	Schema      string        `env:"DATABASE_SCHEMA"`
-	Mode        string        `env:"DATABASE_MODE"`
-	ParseTime   bool          `env:"DATABASE_PARSETIME"`
-	Autoconnect bool          `env:"DATABASE_AUTOCONNECT"`
-	MaxOpen     int           `env:"DATABASE_MAXOPEN"`
-	MaxIdle     int           `env:"DATABASE_MAXIDLE"`
-	MaxLifetime time.Duration `env:"DATABASE_MAXLIFETIME"`
-	Verbose     bool          `env:"DATABASE_VERBOSE"`
-	Debug       bool          `env:"DATABASE_DEBUG"`
+	Driver         string        `env:"DATABASE_DRIVER"`
+	Protocol       string        `env:"DATABASE_PROTOCOL"`
+	Host           string        `env:"DATABASE_HOST"`
+	Port           string        `env:"DATABASE_PORT"`
+	User           string        `env:"DATABASE_USER"`
+	Pass           string        `env:"DATABASE_PASS"`
+	Charset        string        `env:"DATABASE_CHARSET"`
+	Schema         string        `env:"DATABASE_SCHEMA"`
+	Mode           string        `env:"DATABASE_MODE"`
+	ParseTime      bool          `env:"DATABASE_PARSETIME"`
+	Autoconnect    bool          `env:"DATABASE_AUTOCONNECT"`
+	MaxOpen        int           `env:"DATABASE_MAXOPEN"`
+	MaxIdle        int           `env:"DATABASE_MAXIDLE"`
+	MaxLifetime    time.Duration `env:"DATABASE_MAXLIFETIME"`
+	ProfilerEnable bool          `env:"DATABASE_PROFILER_ENABLE"`
+	ProfilerOutput string        `env:"DATABASE_PROFILER_OUTPUT"`
+	Verbose        bool          `env:"DATABASE_VERBOSE"`
+	Debug          bool          `env:"DATABASE_DEBUG"`
 }
 
 // Boot load the default environment configuration.
@@ -62,7 +63,7 @@ func (e *Environment) Load(alias string) {
 	}
 
 	for _, key := range []string{"DSN", "DRIVER", "PROTOCOL", "HOST", "PORT", "USER", "PASS", "CHARSET", "SCHEMA", "MODE", "AUTOCONNECT", "MAXOPEN", "MAXIDLE", "MAXLIFETIME", "PARSETIME"} {
-		if v, ok := os.LookupEnv(fmt.Sprintf("DATABASE_%s_%s", alias, key)); ok {
+		if v, ok := env.Lookup(fmt.Sprintf("DATABASE_%s_%s", e.Alias, key)); ok {
 			switch key {
 			case "DSN":
 				e.DSN = v

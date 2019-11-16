@@ -4,3 +4,14 @@
 // license that can be found in the LICENSE file.
 
 package database
+
+import "testing"
+
+func TestEnvironmentBoot(t *testing.T) {
+}
+
+func TestEnvironmentLoad(t *testing.T) {
+}
+
+func TestEnvironmentValidate(t *testing.T) {
+}
