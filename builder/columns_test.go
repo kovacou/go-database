@@ -18,4 +18,6 @@ func TestColumns(t *testing.T) {
 	assert.Equal(t, "col1", cols.String())
 	cols.Add("col2")
 	assert.Equal(t, "col1,col2", cols.String())
+	cols = ParseColumns("col3", "col4", "col5")
+	assert.Equal(t, "col3,col4,col5", cols.String())
 }

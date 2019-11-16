@@ -15,19 +15,10 @@ const (
 	setKeyword    = " SET "
 )
 
-// Binds is used to bind column to another one. (Raw version, no secure)
-type Binds map[string]string
-
-// String
-func (b Binds) String() string {
-	str := strings.Builder{}
-	return str.String()
-}
-
 // Update is the representation of an Update statement.
 type Update struct {
 	Table  string
-	Values Values
+	Values H
 	Binds  Binds
 	Joins  Joins
 	Where  Where

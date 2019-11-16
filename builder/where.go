@@ -18,12 +18,6 @@ const (
 	notInKeyword = " NOT IN "
 )
 
-// Slicer abstract a slice (until generics are supported)
-type Slicer interface {
-	Len() int
-	S() []interface{}
-}
-
 // ParseWhere create a new Where based on string input.
 // This function should be called to initiate the Where field.
 func ParseWhere(str string, args ...interface{}) (out Where) {
