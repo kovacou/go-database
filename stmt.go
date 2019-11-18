@@ -240,12 +240,12 @@ func (conn *db) profilingStmt(stmt Stmt, err error, t time.Time) {
 	}
 
 	qs := &qs{
+		end:     time.Now(),
 		query:   stmt.String(),
 		args:    stmt.Args(),
 		ctxID:   conn.ctx.id,
 		ctxFlag: conn.ctx.flag,
 		start:   t,
-		end:     time.Now(),
 	}
 
 	conn.ctx.Push(qs)
