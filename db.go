@@ -30,12 +30,21 @@ type db struct {
 
 // Copy the current connection.
 func (conn *db) Copy() Connection {
-	return conn
+	return conn.copy()
 }
 
 // copy the current connection.
 func (conn *db) copy() *db {
-	return conn
+	return &db{
+		id:       conn.id,
+		dbx:      conn.dbx,
+		m:        conn.m,
+		logOut:   conn.logOut,
+		logErr:   conn.logErr,
+		ctx:      conn.ctx,
+		env:      conn.env,
+		profiler: conn.profiler,
+	}
 }
 
 // SetLogger set a new logger to the db.
@@ -138,10 +147,14 @@ func (conn *db) Connect() (err error) {
 		conn.ctx = newContext(nil)
 		conn.profiler = newProfiler(conn.env.ProfilerOutput)
 		conn.m.Unlock()
+
+		if conn.hasVerbose() {
+			conn.logOut.Printf("profiler is running on \033[3;1m%s\033[0m", conn.profiler.DirectoryOutput)
+		}
 	}
 
 	if conn.hasVerbose() {
-		conn.logOut.Printf("connected")
+		conn.logOut.Printf("\033[92;1mconnected ✔\033[0m")
 	}
 
 	return
