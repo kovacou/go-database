@@ -170,6 +170,8 @@ func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, 
 				conn.env.Port,
 				conn.env.Schema,
 			)
+
+			conn.logOut.Printf("setting: %d MaxIdle | %d MaxOpen | %s MaxLifetime", conn.env.MaxIdle, conn.env.MaxOpen, conn.env.MaxLifetime.String())
 		}
 	}
 
