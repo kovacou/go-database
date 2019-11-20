@@ -121,8 +121,8 @@ func (conn *db) runMapRow(stmt Stmt, mapper MapMapper) (rowsReturned int, err er
 
 	var (
 		stmtx  *sqlx.Stmt
-		values map[string]interface{}
 		t      time.Time
+		values = map[string]interface{}{}
 	)
 
 	if conn.hasProfiling() {
