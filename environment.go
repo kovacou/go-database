@@ -94,7 +94,7 @@ func (e *Environment) Load(alias string) {
 			case "MAXIDLE":
 				e.MaxIdle = toInt(v)
 			case "MAXLIFETIME":
-				e.MaxLifetime, _ = time.ParseDuration(v)
+				e.MaxLifetime = toDuration(v)
 			case "VERBOSE":
 				e.Verbose = toBool(v)
 			case "DEBUG":
