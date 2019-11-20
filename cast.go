@@ -5,7 +5,10 @@
 
 package database
 
-import "strconv"
+import (
+	"strconv"
+	"time"
+)
 
 // toBool convert string v to bool.
 func toBool(v string) bool {
@@ -20,4 +23,10 @@ func toBool(v string) bool {
 func toInt(v string) int {
 	out, _ := strconv.ParseInt(v, 0, 0)
 	return int(out)
+}
+
+// toDuration convert string to duration.
+func toDuration(v string) time.Duration {
+	out, _ := time.ParseDuration(v)
+	return out
 }
