@@ -52,7 +52,7 @@ import (
 )
 
 type User struct {
-    ID   int64
+    ID   uint64
     Name string
 }
 
@@ -136,10 +136,70 @@ func main() {
 
 ### Select
 
+```go
+s := builder.Select{
+    Table: "users",
+    Columns: builder.ParseColumns("id", "name"),
+    Where: builder.ParseWhere("id > ?", 1),
+    OrderBy: builder.ParseOrderBy("name ASC"),
+}
+```
 
 #### Map
+The columns can be read by key name.
+
+```go
+// Parse 1 row only. 
+{
+    out := User{}
+    n, err := db.SelectMapRow(&s, func(v map[string]interface{}) {   
+        // If there is more than 1 row, an error occur.
+        // `n` return 0 or 1.
+        outRow.ID = v["id"].(int64)
+        outRow.Name = string(v["name"].([]byte))
+    })
+}
+
+// Parse multiple rows.
+{
+    out := []User{}
+    n, err := db.SelectMap(&s, func(v map[string]interface{}) {
+        // `n` contains the number of rows returned.
+        out = append(out, User{
+            ID:   v["id"].(int64),
+            Name: string(v["name"].([]byte)),
+        })
+    })
+}
+```
 
 #### Slice
+
+The columns can be read by indexes from the Column clause (same order).
+
+```go
+// Parse 1 row only
+{
+    out := User{}
+    n, err := db.SelectSliceRow(&s, func(v []interface{}){
+        // If there is more than1 row, an error occur.
+        // `n` return 0 or 1
+        out.ID = v[0].(int64)
+        out.Name = string(v[1].([]byte))
+    })
+}
+
+// Parse multiple rows
+{
+    out := []User{}
+    n, err := db.SelectSlice(&s, func(v []interface{}){
+        out = append(out, User{
+            ID: v[0].(int64),
+            Name: string(v[1].([]byte)),
+        })
+    })
+}
+```
 
 ### Exec
 
