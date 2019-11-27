@@ -87,10 +87,6 @@ func (conn *db) Close() (err error) {
 		conn.ctx.Done()
 	}
 
-	if conn.profiler != nil {
-		conn.profiler.close()
-	}
-
 	if dbx := (*conn.dbx); dbx != nil {
 		err = dbx.Close()
 	}

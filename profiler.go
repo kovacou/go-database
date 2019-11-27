@@ -18,55 +18,18 @@ import (
 
 // newProfiler create a new profiler.
 func newProfiler(output string) *profiler {
-	p := &profiler{
+	return &profiler{
 		DirectoryOutput: output,
 	}
-	p.start()
-
-	return p
 }
 
+// profiler is a feature that export computed string into files.
 type profiler struct {
 	DirectoryOutput string
-	store           chan profile
 	i               uint
 }
 
-func (p *profiler) start() {
-	if p.store == nil {
-		p.store = make(chan profile)
-	}
-
-	go func() {
-		for m := range p.store {
-			flag := slugify.Slugify(m.flag)
-			if flag == "" {
-				flag = "default"
-			}
-
-			filename := fmt.Sprintf(
-				"%s/%s/%s/%s/%d____%s.sql",
-				p.DirectoryOutput,
-				m.qs.Start().Format("2006_01_02"),
-				flag,
-				m.qs.ContextID(),
-				p.i,
-				m.qs.Runtime().String(),
-			)
-
-			p.write(filename, m.qs.Bytes())
-			p.i++
-		}
-	}()
-}
-
-func (p *profiler) close() error {
-	if p.store != nil {
-		close(p.store)
-	}
-	return nil
-}
-
+// write content into filename and create directories recursively.
 func (p *profiler) write(filename string, body []byte) error {
 	filename = path.Clean(filename)
 	os.MkdirAll(filepath.Dir(filename), os.ModePerm)
@@ -75,20 +38,25 @@ func (p *profiler) write(filename string, body []byte) error {
 
 // Push a new profile into the profiler.
 func (p *profiler) Push(qs QueryState) {
-	if p.store != nil {
-		p.store <- profile{
-			qs:   qs,
-			flag: strings.Join(qs.ContextFlag(), " "),
-		}
+	flag := slugify.Slugify(strings.Join(qs.ContextFlag(), " "))
+
+	if flag == "" {
+		flag = "default"
 	}
-}
 
-type profile struct {
-	qs   QueryState
-	flag string
-}
+	filename := fmt.Sprintf(
+		"%s/%s/%s/%s/%d____%s.sql",
+		p.DirectoryOutput,
+		qs.Start().Format("2006_01_02"),
+		flag,
+		qs.ContextID(),
+		p.i,
+		qs.Runtime().String(),
+	)
 
-// -------------------------------------------------
+	p.write(filename, qs.Bytes())
+	p.i++
+}
 
 // HasProfiler says if the connection has a profiler.
 func (conn *db) HasProfiler() bool {
