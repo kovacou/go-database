@@ -8,10 +8,9 @@ package database
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
-
-	"bitbucket.org/mylittleadventure/go-cast"
 )
 
 // QueryState is the interface that abstract the state of the execution of an query.
@@ -65,10 +64,10 @@ func (p *qs) Bytes() []byte {
 	q := p.query
 
 	for _, a := range p.args {
-		arg := cast.ToString(a)
+		arg := fmt.Sprint(a)
 
-		if _, err := cast.ToIntE(a); err != nil {
-			if _, err := cast.ToFloat64E(a); err != nil {
+		if _, err := strconv.ParseInt(arg, 0, 0); err != nil {
+			if _, err := strconv.ParseFloat(arg, 64); err != nil {
 				arg = fmt.Sprintf("\"%s\"", arg)
 			}
 		}
