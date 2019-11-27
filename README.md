@@ -2,7 +2,8 @@
 
 Personal project.  
 
-`go-database` is a library made for `mysql` which provides a set of extensions on top of [`jmoiron/sqlx`](https://github.com/jmoiron/sqlx) such as a querybuilder, profiler, context & transactions for performances. **This is not an ORM**.
+`go-database` is a library made for `mysql` which provides a set of extensions on top of [`jmoiron/sqlx`](https://github.com/jmoiron/sqlx) such as a querybuilder, profiler, context & transactions for performances. **This is not an ORM**.  
+I plan to support `pgsql` in the future.
 
 ## ➡ features
 
@@ -117,7 +118,6 @@ func main() {
 ### **With environ**
 
 ## ➡ closing all connections
-
 ```go
 func main() {
     // Defering the close in your main ensure closing 
@@ -130,11 +130,28 @@ func main() {
 
 ## ➡ transactions
 
+Support of transactions.
+
+```go
+// tx, err := db.Tx() 
+tx, err := db.Tx(sql.LevelSerializable)
+if err != nil {
+    panic(err)
+}
+
+// use tx to run some requests.
+
+tx.Commit()
+tx.Rollback()
+
+// You can't use tx anymore, else an error will occur.
+```
+
 ## ➡ profiling & context
 
 ## ➡ statements
 
-### Select
+### **Select**
 
 ```go
 s := builder.Select{
@@ -175,8 +192,8 @@ The columns can be read by key name.
 
 #### Slice
 
-The columns can be read by indexes from the Column clause (same order).
-
+The columns can be read by indexes from the Column clause (same order).  
+**Note:** Slice is faster than Map. Prefer use Slice when the columns have always the same order.
 ```go
 // Parse 1 row only
 {
@@ -194,14 +211,14 @@ The columns can be read by indexes from the Column clause (same order).
     out := []User{}
     n, err := db.SelectSlice(&s, func(v []interface{}){
         out = append(out, User{
-            ID: v[0].(int64),
+            ID:   v[0].(int64),
             Name: string(v[1].([]byte)),
         })
     })
 }
 ```
 
-### Exec
+### **Exec**
 
 #### Insert
 ```go
