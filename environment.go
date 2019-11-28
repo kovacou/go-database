@@ -118,7 +118,6 @@ func (e *Environment) Validate() error {
 	}
 
 	// Managing default values.
-
 	if e.Driver == "" {
 		e.Driver = defaultDriver
 	}

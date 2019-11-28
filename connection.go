@@ -29,6 +29,9 @@ var (
 
 	// pool of sqlx wrapper.
 	cp = make([]*sqlx.DB, 0, 5)
+
+	// map of ...
+	cm = make(map[string]uint, 5)
 )
 
 // MapMapper is the prototype to map a map result.
@@ -86,7 +89,12 @@ func Close() {
 
 // Open opens a database from default environement.
 func Open(logger ...*log.Logger) (Connection, error) {
-	return open(nil, "", nil, logger)
+	return open(nil, false, "", nil, logger)
+}
+
+// OpenOnce opens a new connection or return the existing one.
+func OpenOnce(logger ...*log.Logger) (Connection, error) {
+	return open(nil, true, "", nil, logger)
 }
 
 // OpenWith opens a database with given connection.
@@ -96,33 +104,43 @@ func OpenWith(dbx *sqlx.DB, logger ...*log.Logger) (Connection, error) {
 
 // OpenEnv opens a database from given environment.
 func OpenEnv(env string, logger ...*log.Logger) (Connection, error) {
-	return open(nil, env, nil, logger)
+	return open(nil, false, env, nil, logger)
 }
 
-// OpenEnviron opens a database from a given environment.
+// OpenOnceEnv opens a database from a given environment or return an existing one.
+func OpenOnceEnv(env string, logger ...*log.Logger) (Connection, error) {
+	return open(nil, true, env, nil, logger)
+}
+
+// OpenEnviron opens a database from a given environ.
 func OpenEnviron(e Environment, logger ...*log.Logger) (Connection, error) {
-	return openEnviron(e, logger)
+	return openEnviron(e, false, logger)
+}
+
+// OpenOnceEnviron opens a database from a given environ or return existing one.
+func OpenOnceEnviron(e Environment, logger ...*log.Logger) (Connection, error) {
+	return openEnviron(e, true, logger)
 }
 
 // -------------------------------------------------
 
 // openEnv open a new connection through environment variables.
-func openEnv(env string, logger []*log.Logger) (*db, error) {
-	return open(nil, env, nil, logger)
+func openEnv(env string, once bool, logger []*log.Logger) (*db, error) {
+	return open(nil, once, env, nil, logger)
 }
 
 // openEnviron open a new connection with a given Environ.
-func openEnviron(e Environment, logger []*log.Logger) (*db, error) {
-	return open(&e, "", nil, logger)
+func openEnviron(e Environment, once bool, logger []*log.Logger) (*db, error) {
+	return open(&e, once, "", nil, logger)
 }
 
 // openWith open a new connection with a given sqlx.DB connection.
 func openWith(dbx *sqlx.DB, logger []*log.Logger) (*db, error) {
-	return open(nil, "", dbx, logger)
+	return open(nil, false, "", dbx, logger)
 }
 
 // open a new connection based on input.
-func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, error) {
+func open(e *Environment, once bool, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, error) {
 	var cfg Environment
 
 	if e == nil {
@@ -143,7 +161,13 @@ func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, 
 		m:   &sync.Mutex{},
 	}
 
-	conn.id, conn.dbx = createNewConnection()
+	if once {
+		m.Lock()
+
+		m.Unlock()
+	}
+	conn.id, conn.dbx = createNewConnection(once, cfg.Alias)
+
 	if conn.hasVerbose() {
 		if n := len(logger); n > 0 {
 			conn.logOut = logger[0]
@@ -179,15 +203,25 @@ func open(e *Environment, env string, dbx *sqlx.DB, logger []*log.Logger) (*db, 
 }
 
 // createNewConnection in the pool "cp".
-func createNewConnection(dbx ...*sqlx.DB) (uint, **sqlx.DB) {
+func createNewConnection(once bool, alias string, dbx ...*sqlx.DB) (uint, **sqlx.DB) {
 	m.Lock()
+	defer m.Unlock()
+
+	if once {
+		if i, ok := cm[alias]; ok && cp[i] != nil {
+			return i, &cp[i]
+		}
+	}
+
 	cid := uint(len(cp))
 	if len(dbx) > 0 {
 		cp = append(cp, dbx[0])
 	} else {
 		cp = append(cp, nil)
 	}
-	m.Unlock()
+	if once {
+		cm[alias] = cid
+	}
 
 	return cid, &cp[cid]
 }

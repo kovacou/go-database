@@ -6,6 +6,7 @@
 package database
 
 import (
+	// Loading mysql driver by default.
 	_ "github.com/go-sql-driver/mysql"
 
 	"database/sql/driver"
