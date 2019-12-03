@@ -24,8 +24,8 @@ type Select struct {
 	Having  Having
 	GroupBy GroupBy
 	OrderBy OrderBy
-	Limit   int
-	Offset  int
+	Limit   uint64
+	Offset  uint64
 }
 
 // String convert the select to string.
