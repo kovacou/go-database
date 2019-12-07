@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+
 	"github.com/kovacou/go-database/builder"
 )
 
@@ -60,12 +61,22 @@ func (conn *db) Exec(stmt Stmt) (res sql.Result, err error) {
 	return
 }
 
-// QueryMap
+// QuerySlice run an SELECT query to fetch a single result using a slice mapper.
+func (conn *db) QuerySlice(query string, mapper SliceMapper, args ...interface{}) (rowsReturned int, err error) {
+	return conn.runSlice(builder.NewQuery(query, args), mapper)
+}
+
+// QuerySliceRow run an SELECT query to fetch multiple results using a slice mapper.
+func (conn *db) QuerySliceRow(query string, mapper SliceMapper, args ...interface{}) (rowsReturned int, err error) {
+	return conn.runSliceRow(builder.NewQuery(query, args), mapper)
+}
+
+// QueryMap run an SELECT query to fetch multiple results using a map mapper.
 func (conn *db) QueryMap(query string, mapper MapMapper, args ...interface{}) (rowsReturned int, err error) {
 	return conn.runMap(builder.NewQuery(query, args), mapper)
 }
 
-// QueryMapRow
+// QueryMapRow run an SELECT query to fetch a single result using a map mapper.
 func (conn *db) QueryMapRow(query string, mapper MapMapper, args ...interface{}) (rowsReturned int, err error) {
 	return conn.runMapRow(builder.NewQuery(query, args), mapper)
 }
