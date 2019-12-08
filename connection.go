@@ -61,7 +61,9 @@ type Connection interface {
 	SelectSliceRow(Stmt, SliceMapper) (int, error)
 
 	QueryMap(string, MapMapper, ...interface{}) (int, error)
+	QuerySlice(string, SliceMapper, ...interface{}) (int, error)
 	QueryMapRow(string, MapMapper, ...interface{}) (int, error)
+	QuerySliceRow(string, SliceMapper, ...interface{}) (int, error)
 
 	// Context
 	Context(...string) Connection
