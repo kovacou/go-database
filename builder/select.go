@@ -81,10 +81,10 @@ func (s *Select) String() string {
 func (s *Select) Args() (out []interface{}) {
 	out = append(out, s.Joins.Args()...)
 	if s.Where != nil {
-		out = append(out, s.Where.Args())
+		out = append(out, s.Where.Args()...)
 	}
 	if s.Having != nil {
-		out = append(out, s.Having.Args())
+		out = append(out, s.Having.Args()...)
 	}
 	return
 }
