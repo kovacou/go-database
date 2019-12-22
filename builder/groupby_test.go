@@ -12,10 +12,13 @@ import (
 )
 
 func TestGroupBy(t *testing.T) {
-	g := GroupBy{}
+	g := groupBy{}
 	assert.Empty(t, g.String())
 	g.Add("col1")
 	assert.Equal(t, "col1", g.String())
-	g = ParseGroupBy("col2", "col3", "col4")
-	assert.Equal(t, "col2,col3,col4", g.String())
+
+	{
+		g := ParseGroupBy("col2", "col3", "col4")
+		assert.Equal(t, "col2,col3,col4", g.String())
+	}
 }

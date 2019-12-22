@@ -26,15 +26,17 @@ func (d *Delete) String() string {
 	q.WriteString(fromKeyword)
 	q.WriteString(d.Table)
 
-	if d.Where.str.Len() > 0 {
+	if d.Where != nil && d.Where.Len() > 0 {
 		q.WriteString(whereKeyword)
-		q.WriteString(d.Where.str.String())
+		q.WriteString(d.Where.String())
 	}
-
 	return q.String()
 }
 
 // Args compute the arguments of the delete statement.
 func (d *Delete) Args() (out []interface{}) {
-	return d.Where.args
+	if d.Where != nil {
+		out = d.Where.Args()
+	}
+	return
 }

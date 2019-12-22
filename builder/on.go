@@ -9,21 +9,27 @@ const (
 	onKeyword = " ON "
 )
 
+// NewOn create a new On.
+func NewOn() On {
+	return &where{}
+}
+
 // ParseOn create a new Having based on string input.
 // This function should be called to initiate the On field from Join.
-func ParseOn(str string, args ...interface{}) (out On) {
-	out.And(str, args...)
-	return
+func ParseOn(str string, args ...interface{}) On {
+	out := &where{}
+	return out.And(str, args...)
 }
 
 // MakeOn create a new On with complex rules.
 // This function should be called to initiate the On field from Joins.
-func MakeOn(f func(o *On)) (out On) {
-	f(&out)
-	return
+func MakeOn(f func(o On)) On {
+	out := &where{}
+	f(out)
+	return out
 }
 
 // On is the representation of the On clause.
-type On struct {
+type On interface {
 	Where
 }

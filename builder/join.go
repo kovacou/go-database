@@ -37,7 +37,7 @@ func (j Joins) String() string {
 func (j Joins) Args() []interface{} {
 	out := []interface{}{}
 	for i := range j {
-		out = append(out, j[i].On.args...)
+		out = append(out, j[i].Args()...)
 	}
 	return out
 }
@@ -58,14 +58,14 @@ func (j *Join) String() string {
 		fmt.Fprintf(&str, " JOIN %s", j.Table)
 	}
 
-	if j.On.str.Len() > 0 {
+	if j.On.Len() > 0 {
 		str.WriteString(onKeyword)
-		str.WriteString(j.On.str.String())
+		str.WriteString(j.On.String())
 	}
 	return str.String()
 }
 
 // Args return the arguments for the join.
-func (j *Join) Args() []interface{} {
-	return j.On.args
+func (j *Join) Args() (args []interface{}) {
+	return j.On.Args()
 }

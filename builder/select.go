@@ -32,7 +32,11 @@ type Select struct {
 func (s *Select) String() string {
 	q := strings.Builder{}
 	q.WriteString(selectKeyword)
-	q.WriteString(s.Columns.String())
+	if s.Columns != nil {
+		q.WriteString(s.Columns.String())
+	} else {
+		q.WriteString("*")
+	}
 	q.WriteString(fromKeyword)
 	q.WriteString(s.Table)
 
@@ -42,27 +46,27 @@ func (s *Select) String() string {
 	}
 
 	// Where clause
-	if s.Where.str.Len() > 0 {
+	if s.Where != nil && s.Where.Len() > 0 {
 		q.WriteString(whereKeyword)
-		q.WriteString(s.Where.str.String())
+		q.WriteString(s.Where.String())
 	}
 
 	// Group By clause
-	if s.GroupBy.str.Len() > 0 {
+	if s.GroupBy != nil && s.GroupBy.Len() > 0 {
 		q.WriteString(groupByKeyword)
-		q.WriteString(s.GroupBy.str.String())
+		q.WriteString(s.GroupBy.String())
 	}
 
 	// Having clause
-	if s.Having.str.Len() > 0 {
+	if s.Having != nil && s.Having.Len() > 0 {
 		q.WriteString(havingKeyword)
-		q.WriteString(s.Having.str.String())
+		q.WriteString(s.Having.String())
 	}
 
 	// OrderBy clause
-	if s.OrderBy.str.Len() > 0 {
+	if s.OrderBy != nil && s.OrderBy.Len() > 0 {
 		q.WriteString(orderByKeyword)
-		q.WriteString(s.OrderBy.str.String())
+		q.WriteString(s.OrderBy.String())
 	}
 
 	// Pagination
@@ -76,7 +80,11 @@ func (s *Select) String() string {
 // Args compute the arguments of the select query.
 func (s *Select) Args() (out []interface{}) {
 	out = append(out, s.Joins.Args()...)
-	out = append(out, s.Where.args...)
-	out = append(out, s.Having.args...)
+	if s.Where != nil {
+		out = append(out, s.Where.Args())
+	}
+	if s.Having != nil {
+		out = append(out, s.Having.Args())
+	}
 	return
 }

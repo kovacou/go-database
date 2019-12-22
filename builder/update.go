@@ -51,9 +51,9 @@ func (u *Update) String() string {
 	}
 
 	// WHERE clause
-	if u.Where.str.Len() > 0 {
+	if u.Where != nil && u.Where.Len() > 0 {
 		q.WriteString(whereKeyword)
-		q.WriteString(u.Where.str.String())
+		q.WriteString(u.Where.String())
 	}
 	return q.String()
 }
@@ -64,6 +64,8 @@ func (u *Update) Args() (out []interface{}) {
 		out = append(out, u.Values[k])
 	}
 
-	out = append(out, u.Where.args...)
+	if u.Where != nil {
+		out = append(out, u.Where.Args()...)
+	}
 	return
 }

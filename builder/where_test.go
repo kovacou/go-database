@@ -12,7 +12,7 @@ import (
 )
 
 func TestMakeWhere(t *testing.T) {
-	w := MakeWhere(func(w *Where) {
+	w := MakeWhere(func(w Where) {
 		w.And("col1 = ?", "test")
 		w.And("col2 IS NOT NULL")
 	})
@@ -29,7 +29,7 @@ func TestParseWhere(t *testing.T) {
 	assert.Len(t, w.Args(), 1)
 }
 func TestWhereAnd(t *testing.T) {
-	w := Where{}
+	w := where{}
 	w.And("col1 = ?", "test")
 	assert.Equal(t, "col1 = ?", w.String())
 	assert.Equal(t, []interface{}{"test"}, w.Args())
@@ -39,7 +39,7 @@ func TestWhereAnd(t *testing.T) {
 }
 
 func TestWhereOr(t *testing.T) {
-	w := Where{}
+	w := where{}
 	w.Or("col1 = ?", "test")
 	assert.Equal(t, "col1 = ?", w.String())
 	assert.Equal(t, []interface{}{"test"}, w.Args())
@@ -49,7 +49,7 @@ func TestWhereOr(t *testing.T) {
 }
 
 func TestWhereAndOr(t *testing.T) {
-	w := Where{}
+	w := where{}
 	w.And("col1 = ?")
 	assert.Equal(t, "col1 = ?", w.String())
 	w.Or("col2")

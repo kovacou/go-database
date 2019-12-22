@@ -18,38 +18,78 @@ const (
 	notInKeyword = " NOT IN "
 )
 
+// NewWhere create a new Where.
+func NewWhere() Where {
+	return &where{}
+}
+
 // ParseWhere create a new Where based on string input.
 // This function should be called to initiate the Where field.
-func ParseWhere(str string, args ...interface{}) (out Where) {
-	out.And(str, args...)
-	return
+func ParseWhere(str string, args ...interface{}) Where {
+	out := &where{}
+	return out.And(str, args...)
 }
 
 // MakeWhere create a new Where with complex rules.
 // This function should be called to initiate the Where field.
-func MakeWhere(f func(w *Where)) (out Where) {
-	f(&out)
-	return
+func MakeWhere(f func(w Where)) Where {
+	out := &where{}
+	f(out)
+	return out
 }
 
 // Where clause for the SQL query.
-type Where struct {
+type Where interface {
+	// Args return the arguments of the where.
+	Args() []interface{}
+
+	// String convert Where to string.
+	String() string
+
+	// And add a new condition "AND".
+	And(str string, args ...interface{}) Where
+
+	// AndIn add a new condition "AND" with the operator IN.
+	AndIn(col string, s Slicer) Where
+
+	// AndNotIn add a new condition "AND" with the operator NOT IN.
+	AndNotIn(col string, s Slicer) Where
+
+	// AndWhere merge Where's inside parenthesis with AND condition.
+	// AND ( where )
+	AndWhere(in ...Where) Where
+
+	// Or add a new condition "OR".
+	Or(str string, args ...interface{}) Where
+
+	// OrIn add a new condition "OR" with the operator IN.
+	OrIn(col string, s Slicer) Where
+
+	// OrNotIn add a new condition "OR" with the operator NOT IN.
+	OrNotIn(col string, s Slicer) Where
+
+	// OrWhere merge Where's inside parenthesis with OR condition.
+	// OR ( where )
+	OrWhere(in ...Where) Where
+
+	// Len says the length of the string.
+	Len() int
+}
+
+type where struct {
 	str  strings.Builder
 	args []interface{}
 }
 
-// Args return the arguments of the where.
-func (w *Where) Args() []interface{} {
+func (w *where) Args() []interface{} {
 	return w.args
 }
 
-// String convert Where to string.
-func (w *Where) String() string {
+func (w *where) String() string {
 	return w.str.String()
 }
 
-// And add a new condition "AND".
-func (w *Where) And(str string, args ...interface{}) *Where {
+func (w *where) And(str string, args ...interface{}) Where {
 	if w.str.Len() > 0 {
 		w.str.WriteString(andKeyword)
 	}
@@ -59,35 +99,30 @@ func (w *Where) And(str string, args ...interface{}) *Where {
 	return w
 }
 
-// AndIn add a new condition "AND" with the operator IN.
-func (w *Where) AndIn(col string, s Slicer) *Where {
+func (w *where) AndIn(col string, s Slicer) Where {
 	if n := s.Len(); n > 0 {
 		w.And(whereIn(col, inKeyword, s), s.S()...)
 	}
 	return w
 }
 
-// AndNotIn add a new condition "AND" with the operator NOT IN.
-func (w *Where) AndNotIn(col string, s Slicer) *Where {
+func (w *where) AndNotIn(col string, s Slicer) Where {
 	if n := s.Len(); n > 0 {
 		w.And(whereIn(col, notInKeyword, s), s.S()...)
 	}
 	return w
 }
 
-// AndWhere merge Where's inside parenthesis with AND condition.
-// AND ( where )
-func (w *Where) AndWhere(in ...Where) *Where {
+func (w *where) AndWhere(in ...Where) Where {
 	for _, v := range in {
-		if v.str.Len() > 0 {
-			w.And(fmt.Sprintf("(%s)", v.str.String()), v.args...)
+		if v.Len() > 0 {
+			w.And(fmt.Sprintf("(%s)", v.String()), v.Args()...)
 		}
 	}
 	return w
 }
 
-// Or add a new condition "OR".
-func (w *Where) Or(str string, args ...interface{}) *Where {
+func (w *where) Or(str string, args ...interface{}) Where {
 	if w.str.Len() > 0 {
 		w.str.WriteString(orKeyword)
 	}
@@ -97,31 +132,31 @@ func (w *Where) Or(str string, args ...interface{}) *Where {
 	return w
 }
 
-// OrIn add a new condition "OR" with the operator IN.
-func (w *Where) OrIn(col string, s Slicer) *Where {
+func (w *where) OrIn(col string, s Slicer) Where {
 	if n := s.Len(); n > 0 {
 		w.Or(whereIn(col, inKeyword, s), s.S()...)
 	}
 	return w
 }
 
-// OrNotIn add a new condition "OR" with the operator NOT IN.
-func (w *Where) OrNotIn(col string, s Slicer) *Where {
+func (w *where) OrNotIn(col string, s Slicer) Where {
 	if n := s.Len(); n > 0 {
 		w.Or(whereIn(col, notInKeyword, s), s.S()...)
 	}
 	return w
 }
 
-// OrWhere merge Where's inside parenthesis with OR condition.
-// OR ( where )
-func (w *Where) OrWhere(in ...Where) *Where {
+func (w *where) OrWhere(in ...Where) Where {
 	for _, v := range in {
-		if v.str.Len() > 0 {
-			w.Or(fmt.Sprintf("(%s)", v.str.String()), v.args...)
+		if v.Len() > 0 {
+			w.Or(fmt.Sprintf("(%s)", v.String()), v.Args()...)
 		}
 	}
 	return w
+}
+
+func (w *where) Len() int {
+	return w.str.Len()
 }
 
 // whereIn

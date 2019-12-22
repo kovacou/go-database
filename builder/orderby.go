@@ -11,17 +11,20 @@ const (
 
 // ParseOrderBy create a new OrderBy based on a string(s) input.
 // This function should be called to initiate the OrderBy field.
-func ParseOrderBy(cols ...string) (out OrderBy) {
-	out.Add(cols...)
-	return
+func ParseOrderBy(cols ...string) OrderBy {
+	out := &orderBy{}
+	return out.Add(cols...)
 }
 
 // OrderBy clause for the SELECT query.
-type OrderBy struct {
+type OrderBy interface {
 	Columns
 }
 
-// String return the natural string of Columns with "*".
-func (gb *OrderBy) String() string {
-	return gb.str.String()
+type orderBy struct {
+	columns
+}
+
+func (ob *orderBy) String() string {
+	return ob.str.String()
 }

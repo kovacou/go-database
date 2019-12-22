@@ -10,20 +10,35 @@ import (
 	"strings"
 )
 
+// NewColumns create a new Columns.
+func NewColumns() Columns {
+	return &columns{}
+}
+
 // ParseColumns create a new Columns based on a string(s) input.
 // This function should be called to initiate the Columns field.
-func ParseColumns(cols ...string) (out Columns) {
-	out.Add(cols...)
-	return
+func ParseColumns(cols ...string) Columns {
+	out := &columns{}
+	return out.Add(cols...)
 }
 
 // Columns is list of columns.
-type Columns struct {
+type Columns interface {
+	// Add a columns to the list.
+	Add(...string) Columns
+
+	// String convert Columns to string.
+	String() string
+
+	// Len says the size of the string.
+	Len() int
+}
+
+type columns struct {
 	str strings.Builder
 }
 
-// Add a columns to the list.
-func (c *Columns) Add(col ...string) *Columns {
+func (c *columns) Add(col ...string) Columns {
 	if len(col) > 0 {
 		if c.str.Len() > 0 {
 			fmt.Fprintf(&c.str, ",%s", strings.Join(col, ","))
@@ -34,8 +49,11 @@ func (c *Columns) Add(col ...string) *Columns {
 	return c
 }
 
-// String convert Columns to string.
-func (c *Columns) String() string {
+func (c *columns) Len() int {
+	return c.str.Len()
+}
+
+func (c *columns) String() string {
 	if c.str.Len() == 0 {
 		return "*"
 	}

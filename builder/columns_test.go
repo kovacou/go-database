@@ -12,12 +12,15 @@ import (
 )
 
 func TestColumns(t *testing.T) {
-	cols := Columns{}
+	cols := columns{}
 	assert.Equal(t, "*", cols.String())
 	cols.Add("col1")
 	assert.Equal(t, "col1", cols.String())
 	cols.Add("col2")
 	assert.Equal(t, "col1,col2", cols.String())
-	cols = ParseColumns("col3", "col4", "col5")
-	assert.Equal(t, "col3,col4,col5", cols.String())
+
+	{
+		cols := ParseColumns("col3", "col4", "col5")
+		assert.Equal(t, "col3,col4,col5", cols.String())
+	}
 }
