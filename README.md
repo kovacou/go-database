@@ -265,6 +265,8 @@ u := builder.Update{
         "name": "John",
     },
     Where: builder.ParseWhere("id = ?", 1) // Used to initiate the value (if needed)
+    // To initiate empty value :
+    // builder.NewWhere()
 }
 
 // You can also use where like following :
@@ -282,6 +284,8 @@ r, err := db.Exec(&u)
 d := builder.Delete{
     Table: "users",
     Where: builder.ParseWhere("id = ?", 1) // Used to initiate the value (if needed)
+    // To initiate empty value :
+    // builder.NewWhere()
 }
 
 // You can also use where like following :
