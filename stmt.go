@@ -7,6 +7,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -113,6 +114,10 @@ func (conn *db) runMap(stmt Stmt, mapper MapMapper) (rowsReturned int, err error
 				mapper(row)
 				rowsReturned++
 			}
+		} else if errors.Is(err, sql.ErrNoRows) {
+			if !conn.env.ErrorNoRows {
+				err = nil
+			}
 		}
 	}
 
@@ -148,6 +153,10 @@ func (conn *db) runMapRow(stmt Stmt, mapper MapMapper) (rowsReturned int, err er
 		if err == nil {
 			mapper(values)
 			rowsReturned = 1
+		} else if errors.Is(err, sql.ErrNoRows) {
+			if !conn.env.ErrorNoRows {
+				err = nil
+			}
 		}
 	}
 
@@ -191,6 +200,10 @@ func (conn *db) runSlice(stmt Stmt, mapper SliceMapper) (rowsReturned int, err e
 				mapper(values)
 				rowsReturned++
 			}
+		} else if errors.Is(err, sql.ErrNoRows) {
+			if !conn.env.ErrorNoRows {
+				err = nil
+			}
 		}
 	}
 
@@ -224,6 +237,10 @@ func (conn *db) runSliceRow(stmt Stmt, mapper SliceMapper) (rowsReturned int, er
 		if values, err = stmtx.QueryRowx(stmt.Args()...).SliceScan(); err == nil {
 			mapper(values)
 			rowsReturned = 1
+		} else if errors.Is(err, sql.ErrNoRows) {
+			if !conn.env.ErrorNoRows {
+				err = nil
+			}
 		}
 	}
 

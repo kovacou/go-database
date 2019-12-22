@@ -49,6 +49,7 @@ type Environment struct {
 	ProfilerOutput string        `env:"DATABASE_PROFILER_OUTPUT"`
 	Verbose        bool          `env:"DATABASE_VERBOSE"`
 	Debug          bool          `env:"DATABASE_DEBUG"`
+	ErrorNoRows    bool          `env:"DATABASE_ERROR_NOROWS"`
 }
 
 // Boot load the default environment configuration.
@@ -62,7 +63,7 @@ func (e *Environment) Load(alias string) {
 		return
 	}
 
-	for _, key := range []string{"DSN", "DRIVER", "PROTOCOL", "HOST", "PORT", "USER", "PASS", "CHARSET", "SCHEMA", "MODE", "AUTOCONNECT", "MAXOPEN", "MAXIDLE", "MAXLIFETIME", "PARSETIME"} {
+	for _, key := range []string{"DSN", "DRIVER", "PROTOCOL", "HOST", "PORT", "USER", "PASS", "CHARSET", "SCHEMA", "MODE", "AUTOCONNECT", "MAXOPEN", "MAXIDLE", "MAXLIFETIME", "PARSETIME", "ERROR_NOROWS"} {
 		if v, ok := env.Lookup(fmt.Sprintf("DATABASE_%s_%s", e.Alias, key)); ok {
 			switch key {
 			case "DSN":
@@ -99,6 +100,8 @@ func (e *Environment) Load(alias string) {
 				e.Verbose = toBool(v)
 			case "DEBUG":
 				e.Debug = toBool(v)
+			case "ERROR_NOROWS":
+				e.ErrorNoRows = toBool(v)
 			}
 		}
 	}
