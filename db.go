@@ -6,13 +6,12 @@
 package database
 
 import (
-	// Loading mysql driver by default.
-	_ "github.com/go-sql-driver/mysql"
-
 	"database/sql/driver"
 	"log"
 	"sync"
 
+	// Loading mysql driver by default.
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 

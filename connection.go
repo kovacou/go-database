@@ -24,7 +24,7 @@ var (
 	// configuration of the connections.
 	Debug bool
 
-	// m is the mutex the manage the pool of sqlx wrapper.
+	// m is the mutex that manage the pool of sqlx wrapper.
 	m sync.Mutex
 
 	// pool of sqlx wrapper.
@@ -34,53 +34,55 @@ var (
 	cm = make(map[string]uint, 5)
 )
 
-// MapMapper is the prototype to map a map result.
-type MapMapper func(map[string]interface{})
+type (
+	// MapMapper is the prototype to map a map result.
+	MapMapper func(map[string]interface{})
 
-// SliceMapper is the prototype to map a slice result.
-type SliceMapper func([]interface{})
+	// SliceMapper is the prototype to map a slice result.
+	SliceMapper func([]interface{})
 
-// Connection is a connection to an database.
-type Connection interface {
-	DB() *sqlx.DB
-	Copy() Connection
-	Connect() error
-	LastError() error
-	Ping() error
-	MustPing()
-	Close() error
-	SetLogger(out *log.Logger, err *log.Logger)
+	// Connection is a connection to an database.
+	Connection interface {
+		DB() *sqlx.DB
+		Copy() Connection
+		Connect() error
+		LastError() error
+		Ping() error
+		MustPing()
+		Close() error
+		SetLogger(out *log.Logger, err *log.Logger)
 
-	// Statements
-	Exec(Stmt) (sql.Result, error)
+		// Statements
+		Exec(Stmt) (sql.Result, error)
 
-	// Queries
-	SelectMap(Stmt, MapMapper) (int, error)
-	SelectSlice(Stmt, SliceMapper) (int, error)
-	SelectMapRow(Stmt, MapMapper) (int, error)
-	SelectSliceRow(Stmt, SliceMapper) (int, error)
+		// Queries
+		SelectMap(Stmt, MapMapper) (int, error)
+		SelectSlice(Stmt, SliceMapper) (int, error)
+		SelectMapRow(Stmt, MapMapper) (int, error)
+		SelectSliceRow(Stmt, SliceMapper) (int, error)
 
-	QueryMap(string, MapMapper, ...interface{}) (int, error)
-	QuerySlice(string, SliceMapper, ...interface{}) (int, error)
-	QueryMapRow(string, MapMapper, ...interface{}) (int, error)
-	QuerySliceRow(string, SliceMapper, ...interface{}) (int, error)
+		QueryMap(string, MapMapper, ...interface{}) (int, error)
+		QuerySlice(string, SliceMapper, ...interface{}) (int, error)
+		QueryMapRow(string, MapMapper, ...interface{}) (int, error)
+		QuerySliceRow(string, SliceMapper, ...interface{}) (int, error)
 
-	// Context
-	Context(...string) Connection
-	Done()
-	HasContext() bool
-	RunContext(...ContextFunc) error
+		// Context
+		Context(...string) Connection
+		Done()
+		HasContext() bool
+		RunContext(...ContextFunc) error
 
-	// Tx
-	IsTx() bool
-	Tx(...sql.IsolationLevel) (Connection, error)
-	Commit() error
-	Rollback() error
-	RunTx(...TxFunc) error
-}
+		// Tx
+		IsTx() bool
+		Tx(...sql.IsolationLevel) (Connection, error)
+		Commit() error
+		Rollback() error
+		RunTx(...TxFunc) error
+	}
+)
 
 // Close closes active connections in the pool.
-// it closes aswell any profiler running in background.
+// it closes any profiler running in background.
 func Close() {
 	m.Lock()
 	defer m.Unlock()

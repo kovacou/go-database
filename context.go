@@ -65,7 +65,7 @@ func (ctx *ctx) generateID() {
 	ctx.id = xid.New().String()
 }
 
-// ID return the id of the context.
+// ID returns the id of the context.
 func (ctx *ctx) ID() string {
 	return ctx.id
 }
@@ -87,7 +87,7 @@ func (ctx *ctx) Flush() {
 	ctx.qsl = []QueryState{}
 }
 
-// Len return the number of query state into the context.
+// Len returns the number of query state into the context.
 func (ctx *ctx) Len() int {
 	return len(ctx.qsl)
 }

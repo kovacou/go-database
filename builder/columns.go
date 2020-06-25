@@ -24,7 +24,7 @@ func ParseColumns(cols ...string) Columns {
 
 // Columns is list of columns.
 type Columns interface {
-	// Add a columns to the list.
+	// Add columns to the list.
 	Add(...string) Columns
 
 	// String convert Columns to string.
@@ -32,6 +32,9 @@ type Columns interface {
 
 	// Len says the size of the string.
 	Len() int
+
+	// Reset resets the list of columns.
+	Reset()
 }
 
 type columns struct {
@@ -59,4 +62,8 @@ func (c *columns) String() string {
 	}
 
 	return c.str.String()
+}
+
+func (c *columns) Reset() {
+	c.str.Reset()
 }
