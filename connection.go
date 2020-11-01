@@ -181,26 +181,26 @@ func open(e *Environment, once bool, env string, dbx *sqlx.DB, logger []*log.Log
 			}
 		} else {
 			prefix := fmt.Sprintf(
-				"(\033[95;1m%s\033[0m:\033[4m%s\033[0m)",
+				"(\033[95;1m%s\033[0m:%s@%s:%s - \033[4m%s\033[0m)",
 				conn.env.Driver,
+				conn.env.User,
+				conn.env.Host,
+				conn.env.Port,
 				conn.env.Alias,
 			)
 
-			conn.logOut = log.New(os.Stdout, fmt.Sprintf("%s ➜ ", prefix), 0)
+			conn.logOut = log.New(os.Stdout, fmt.Sprintf("%s ➜  ", prefix), 0)
 			conn.logErr = log.New(os.Stderr, fmt.Sprintf("%s \033[91m➜ \033[1mERROR: \033[0m ", prefix), 0)
 		}
 
 		if conn.env.DSN == "" {
-			conn.logOut.Printf(
-				"%s@%s:%s[%s] configured and ready",
-				conn.env.User,
-				conn.env.Host,
-				conn.env.Port,
-				conn.env.Schema,
-			)
-
+			conn.logOut.Print("configured and ready")
 			conn.logOut.Printf("setting: %d MaxIdle | %d MaxOpen | %s MaxLifetime", conn.env.MaxIdle, conn.env.MaxOpen, conn.env.MaxLifetime.String())
 		}
+	}
+
+	if conn.env.Autoconnect {
+		conn.Connect()
 	}
 
 	return conn, nil

@@ -36,7 +36,7 @@ type Environment struct {
 	Host           string        `env:"DATABASE_HOST"`
 	Port           string        `env:"DATABASE_PORT"`
 	User           string        `env:"DATABASE_USER"`
-	Pass           string        `env:"DATABASE_PASS"`
+	Pass           string        `env:"DATABASE_PASS" json:"-"`
 	Charset        string        `env:"DATABASE_CHARSET"`
 	Schema         string        `env:"DATABASE_SCHEMA"`
 	Mode           string        `env:"DATABASE_MODE"`
@@ -155,6 +155,10 @@ func (e *Environment) Validate() error {
 
 	if e.MaxLifetime <= time.Second*0 {
 		e.MaxLifetime = defaultMaxLifetime
+	}
+
+	if e.Alias == "" {
+		e.Alias = e.Schema
 	}
 
 	return nil
