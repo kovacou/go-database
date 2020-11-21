@@ -87,7 +87,9 @@ func Close() {
 	m.Lock()
 	defer m.Unlock()
 	for _, dbx := range cp {
-		dbx.Close()
+		if dbx != nil {
+			dbx.Close()
+		}
 	}
 }
 
