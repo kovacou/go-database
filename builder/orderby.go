@@ -16,6 +16,22 @@ func ParseOrderBy(cols ...string) OrderBy {
 	return out.Add(cols...)
 }
 
+// ASC returns ASC if v is true else DESC.
+func ASC(v bool) string {
+	if v {
+		return "ASC"
+	}
+	return "DESC"
+}
+
+// DESC returns DESC if v is true else ASC.
+func DESC(v bool) string {
+	if v {
+		return "DESC"
+	}
+	return "ASC"
+}
+
 // OrderBy clause for the SELECT query.
 type OrderBy interface {
 	Columns
