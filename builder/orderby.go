@@ -9,6 +9,11 @@ const (
 	orderByKeyword = " ORDER BY "
 )
 
+// NewOrderBy create a new OrderBy.
+func NewOrderBy() OrderBy {
+	return &orderBy{}
+}
+
 // ParseOrderBy create a new OrderBy based on a string(s) input.
 // This function should be called to initiate the OrderBy field.
 func ParseOrderBy(cols ...string) OrderBy {
