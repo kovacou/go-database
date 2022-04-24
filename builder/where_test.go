@@ -38,6 +38,21 @@ func TestWhereAnd(t *testing.T) {
 	assert.Equal(t, []interface{}{"test"}, w.Args())
 }
 
+func TestWhereAndIf(t *testing.T) {
+	w := where{}
+	w.AndIf("col1 = ?", 0)
+	assert.Empty(t, w.String())
+	assert.Zero(t, w.Args())
+
+	w.AndIf("col2 = ?", "")
+	assert.Empty(t, w.String())
+	assert.Zero(t, w.Args())
+
+	w.AndIf("col3 = ?", 5)
+	assert.Equal(t, "col3 = ?", w.String())
+	assert.Equal(t, []interface{}{5}, w.Args())
+}
+
 func TestWhereOr(t *testing.T) {
 	w := where{}
 	w.Or("col1 = ?", "test")
@@ -46,6 +61,21 @@ func TestWhereOr(t *testing.T) {
 	w.Or("col2 = ?", "test2")
 	assert.Equal(t, "col1 = ? OR col2 = ?", w.String())
 	assert.Equal(t, []interface{}{"test", "test2"}, w.Args())
+}
+
+func TestWhereOrIf(t *testing.T) {
+	w := where{}
+	w.OrIf("col1 = ?", 0)
+	assert.Empty(t, w.String())
+	assert.Zero(t, w.Args())
+
+	w.OrIf("col2 = ?", "")
+	assert.Empty(t, w.String())
+	assert.Zero(t, w.Args())
+
+	w.OrIf("col3 = ?", 5)
+	assert.Equal(t, "col3 = ?", w.String())
+	assert.Equal(t, []interface{}{5}, w.Args())
 }
 
 func TestWhereAndOr(t *testing.T) {
