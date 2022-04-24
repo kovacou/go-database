@@ -7,6 +7,7 @@ package builder
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -49,6 +50,9 @@ type Where interface {
 	// And add a new condition "AND".
 	And(str string, args ...interface{}) Where
 
+	// AndIf a new condition "AND" if args is Valid & and not Zero.
+	AndIf(str string, arg interface{}) Where
+
 	// AndIn add a new condition "AND" with the operator IN.
 	AndIn(col string, s Slicer) Where
 
@@ -61,6 +65,9 @@ type Where interface {
 
 	// Or add a new condition "OR".
 	Or(str string, args ...interface{}) Where
+
+	// OrIf a new condition "or" if args is Valid & and not Zero.
+	OrIf(str string, arg interface{}) Where
 
 	// OrIn add a new condition "OR" with the operator IN.
 	OrIn(col string, s Slicer) Where
@@ -99,6 +106,14 @@ func (w *where) And(str string, args ...interface{}) Where {
 	return w
 }
 
+func (w *where) AndIf(str string, arg interface{}) Where {
+	if !reflect.ValueOf(arg).IsZero() {
+		w.And(str, arg)
+	}
+
+	return w
+}
+
 func (w *where) AndIn(col string, s Slicer) Where {
 	if n := s.Len(); n > 0 {
 		w.And(whereIn(col, inKeyword, s), s.S()...)
@@ -129,6 +144,14 @@ func (w *where) Or(str string, args ...interface{}) Where {
 
 	w.str.WriteString(str)
 	w.args = append(w.args, args...)
+	return w
+}
+
+func (w *where) OrIf(str string, arg interface{}) Where {
+	if !reflect.ValueOf(arg).IsZero() {
+		w.Or(str, arg)
+	}
+
 	return w
 }
 
