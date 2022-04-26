@@ -26,7 +26,7 @@ type QueryState interface {
 
 type qs struct {
 	query   string
-	args    []interface{}
+	args    []any
 	ctxID   string
 	ctxFlag []string
 	start   time.Time

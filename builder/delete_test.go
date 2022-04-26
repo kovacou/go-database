@@ -18,5 +18,5 @@ func TestDelete(t *testing.T) {
 	}
 
 	assert.Equal(t, "DELETE  FROM test WHERE col1 = ? AND col2 = ?", d.String())
-	assert.Equal(t, d.Args(), []interface{}{1, "val"})
+	assert.Equal(t, d.Args(), []any{1, "val"})
 }

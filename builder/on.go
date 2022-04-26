@@ -16,7 +16,7 @@ func NewOn() On {
 
 // ParseOn create a new Having based on string input.
 // This function should be called to initiate the On field from Join.
-func ParseOn(str string, args ...interface{}) On {
+func ParseOn(str string, args ...any) On {
 	out := &where{}
 	return out.And(str, args...)
 }

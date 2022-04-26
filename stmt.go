@@ -18,7 +18,7 @@ import (
 // Stmt is the representation of an statement or query (SELECT, UPDATE, & DELETE)
 type Stmt interface {
 	String() string
-	Args() []interface{}
+	Args() []any
 }
 
 // SelectMap run an SELECT query to fetch multiple results using a map mapper.
@@ -63,22 +63,22 @@ func (conn *db) Exec(stmt Stmt) (res sql.Result, err error) {
 }
 
 // QuerySlice run an SELECT query to fetch a single result using a slice mapper.
-func (conn *db) QuerySlice(query string, mapper SliceMapper, args ...interface{}) (rowsReturned int, err error) {
+func (conn *db) QuerySlice(query string, mapper SliceMapper, args ...any) (rowsReturned int, err error) {
 	return conn.runSlice(builder.NewQuery(query, args), mapper)
 }
 
 // QuerySliceRow run an SELECT query to fetch multiple results using a slice mapper.
-func (conn *db) QuerySliceRow(query string, mapper SliceMapper, args ...interface{}) (rowsReturned int, err error) {
+func (conn *db) QuerySliceRow(query string, mapper SliceMapper, args ...any) (rowsReturned int, err error) {
 	return conn.runSliceRow(builder.NewQuery(query, args), mapper)
 }
 
 // QueryMap run an SELECT query to fetch multiple results using a map mapper.
-func (conn *db) QueryMap(query string, mapper MapMapper, args ...interface{}) (rowsReturned int, err error) {
+func (conn *db) QueryMap(query string, mapper MapMapper, args ...any) (rowsReturned int, err error) {
 	return conn.runMap(builder.NewQuery(query, args), mapper)
 }
 
 // QueryMapRow run an SELECT query to fetch a single result using a map mapper.
-func (conn *db) QueryMapRow(query string, mapper MapMapper, args ...interface{}) (rowsReturned int, err error) {
+func (conn *db) QueryMapRow(query string, mapper MapMapper, args ...any) (rowsReturned int, err error) {
 	return conn.runMapRow(builder.NewQuery(query, args), mapper)
 }
 
@@ -105,7 +105,7 @@ func (conn *db) runMap(stmt Stmt, mapper MapMapper) (rowsReturned int, err error
 		if err == nil {
 			defer rows.Close()
 
-			row := map[string]interface{}{}
+			row := map[string]any{}
 			for rows.Next() {
 				err = rows.MapScan(row)
 				if err != nil {
@@ -138,7 +138,7 @@ func (conn *db) runMapRow(stmt Stmt, mapper MapMapper) (rowsReturned int, err er
 	var (
 		stmtx  *sqlx.Stmt
 		t      time.Time
-		values = map[string]interface{}{}
+		values = map[string]any{}
 	)
 
 	if conn.hasProfiling() {
@@ -177,7 +177,7 @@ func (conn *db) runSlice(stmt Stmt, mapper SliceMapper) (rowsReturned int, err e
 	var (
 		stmtx  *sqlx.Stmt
 		rows   *sqlx.Rows
-		values []interface{}
+		values []any
 		t      time.Time
 	)
 
@@ -223,7 +223,7 @@ func (conn *db) runSliceRow(stmt Stmt, mapper SliceMapper) (rowsReturned int, er
 
 	var (
 		stmtx  *sqlx.Stmt
-		values []interface{}
+		values []any
 		t      time.Time
 	)
 

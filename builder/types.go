@@ -14,7 +14,7 @@ import (
 // Slicer abstract a slice (until generics are supported)
 type Slicer interface {
 	Len() int
-	S() []interface{}
+	S() []any
 }
 
 // Keys is a slice of string representing a list of key.
@@ -24,7 +24,7 @@ type Keys []string
 type RawKeys map[string]string
 
 // H is the representation of an insert or update values.
-type H map[string]interface{}
+type H map[string]any
 
 // Keys return sorted keys of the values.
 func (v H) Keys() Keys {

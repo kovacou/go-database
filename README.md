@@ -76,7 +76,7 @@ func main() {
     // Mapping through a map
     // (faster than structscan if you look for performance)
     out := []User{}
-    db.SelectMap(&s, func(values map[string]interface{}){
+    db.SelectMap(&s, func(values map[string]any){
         out = append(out, User{
             ID:   values["id"].(int64),
             Name: string(values["name"].([]byte)),
@@ -85,7 +85,7 @@ func main() {
 
     // More faster than previous one.
     out2 := []User{}
-    db.SelectSlice(&s, func(values []interface{}) {
+    db.SelectSlice(&s, func(values []any) {
         out2 = append(out2, User{
             ID:   values[0].(int64),
             Name: string(values[1].([]byte)),
@@ -94,7 +94,7 @@ func main() {
 
     // Using raw query
     out3 := []User{}
-    db.QuerySlice(builder.NewQuery("SELECT * FROM users WHERE id < ?", 10), func(values []interface{}) {
+    db.QuerySlice(builder.NewQuery("SELECT * FROM users WHERE id < ?", 10), func(values []any) {
         out3 = append(out3, User{
             // ...
         })
@@ -169,7 +169,7 @@ The columns can be read by key name.
 // Parse 1 row only. 
 {
     out := User{}
-    n, err := db.SelectMapRow(&s, func(v map[string]interface{}) {   
+    n, err := db.SelectMapRow(&s, func(v map[string]any) {   
         // If there is more than 1 row, an error occur.
         // `n` return 0 or 1.
         outRow.ID = v["id"].(int64)
@@ -180,7 +180,7 @@ The columns can be read by key name.
 // Parse multiple rows.
 {
     out := []User{}
-    n, err := db.SelectMap(&s, func(v map[string]interface{}) {
+    n, err := db.SelectMap(&s, func(v map[string]any) {
         // `n` contains the number of rows returned.
         out = append(out, User{
             ID:   v["id"].(int64),
@@ -198,7 +198,7 @@ The columns can be read by indexes from the Column clause (same order).
 // Parse 1 row only
 {
     out := User{}
-    n, err := db.SelectSliceRow(&s, func(v []interface{}){
+    n, err := db.SelectSliceRow(&s, func(v []any){
         // If there is more than1 row, an error occur.
         // `n` return 0 or 1
         out.ID = v[0].(int64)
@@ -209,7 +209,7 @@ The columns can be read by indexes from the Column clause (same order).
 // Parse multiple rows
 {
     out := []User{}
-    n, err := db.SelectSlice(&s, func(v []interface{}){
+    n, err := db.SelectSlice(&s, func(v []any){
         out = append(out, User{
             ID:   v[0].(int64),
             Name: string(v[1].([]byte)),

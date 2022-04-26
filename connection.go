@@ -36,10 +36,10 @@ var (
 
 type (
 	// MapMapper is the prototype to map a map result.
-	MapMapper func(map[string]interface{})
+	MapMapper func(map[string]any)
 
 	// SliceMapper is the prototype to map a slice result.
-	SliceMapper func([]interface{})
+	SliceMapper func([]any)
 
 	// Connection is a connection to an database.
 	Connection interface {
@@ -61,10 +61,10 @@ type (
 		SelectMapRow(Stmt, MapMapper) (int, error)
 		SelectSliceRow(Stmt, SliceMapper) (int, error)
 
-		QueryMap(string, MapMapper, ...interface{}) (int, error)
-		QuerySlice(string, SliceMapper, ...interface{}) (int, error)
-		QueryMapRow(string, MapMapper, ...interface{}) (int, error)
-		QuerySliceRow(string, SliceMapper, ...interface{}) (int, error)
+		QueryMap(string, MapMapper, ...any) (int, error)
+		QuerySlice(string, SliceMapper, ...any) (int, error)
+		QueryMapRow(string, MapMapper, ...any) (int, error)
+		QuerySliceRow(string, SliceMapper, ...any) (int, error)
 
 		// Context
 		Context(...string) Connection

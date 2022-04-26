@@ -22,12 +22,12 @@ func TestInsert(t *testing.T) {
 	}
 
 	assert.Equal(t, "INSERT INTO test(col1,col2,col3) VALUES(?,?,?)", i.String())
-	assert.Equal(t, i.Args(), []interface{}{"val1", "val2", "val3"})
+	assert.Equal(t, i.Args(), []any{"val1", "val2", "val3"})
 
 	i.IgnoreMode = true
 
 	assert.Equal(t, "INSERT IGNORE INTO test(col1,col2,col3) VALUES(?,?,?)", i.String())
-	assert.Equal(t, i.Args(), []interface{}{"val1", "val2", "val3"})
+	assert.Equal(t, i.Args(), []any{"val1", "val2", "val3"})
 
 	i.OnUpdateKeys = Keys{"col1", "col3"}
 

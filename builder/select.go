@@ -78,7 +78,7 @@ func (s *Select) String() string {
 }
 
 // Args compute the arguments of the select query.
-func (s *Select) Args() (out []interface{}) {
+func (s *Select) Args() (out []any) {
 	out = append(out, s.Joins.Args()...)
 	if s.Where != nil {
 		out = append(out, s.Where.Args()...)

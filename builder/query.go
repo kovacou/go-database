@@ -10,7 +10,7 @@ import (
 )
 
 // NewQuery create a new Query based on string input.
-func NewQuery(str string, args []interface{}) *Query {
+func NewQuery(str string, args []any) *Query {
 	q := &Query{
 		args: args,
 	}
@@ -21,7 +21,7 @@ func NewQuery(str string, args []interface{}) *Query {
 // Query is the representation of an Query statement.
 type Query struct {
 	str  strings.Builder
-	args []interface{}
+	args []any
 }
 
 // String convert query to string.
@@ -30,6 +30,6 @@ func (q *Query) String() string {
 }
 
 // Args return the arguments of the query.
-func (q *Query) Args() []interface{} {
+func (q *Query) Args() []any {
 	return q.args
 }

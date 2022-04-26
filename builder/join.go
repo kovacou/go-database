@@ -34,8 +34,8 @@ func (j Joins) String() string {
 }
 
 // Args return the args of the joins.
-func (j Joins) Args() []interface{} {
-	out := []interface{}{}
+func (j Joins) Args() []any {
+	out := []any{}
 	for i := range j {
 		out = append(out, j[i].Args()...)
 	}
@@ -66,6 +66,6 @@ func (j *Join) String() string {
 }
 
 // Args return the arguments for the join.
-func (j *Join) Args() (args []interface{}) {
+func (j *Join) Args() (args []any) {
 	return j.On.Args()
 }

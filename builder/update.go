@@ -59,7 +59,7 @@ func (u *Update) String() string {
 }
 
 // Args compute the arguments of the update statement.
-func (u *Update) Args() (out []interface{}) {
+func (u *Update) Args() (out []any) {
 	for _, k := range u.Values.Keys() {
 		out = append(out, u.Values[k])
 	}

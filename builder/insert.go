@@ -79,7 +79,7 @@ func (i *Insert) String() string {
 }
 
 // Args compute the arguments of the insert statement.
-func (i *Insert) Args() (out []interface{}) {
+func (i *Insert) Args() (out []any) {
 	for _, k := range i.Values.Keys() {
 		out = append(out, i.Values[k])
 	}

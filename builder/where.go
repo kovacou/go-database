@@ -26,7 +26,7 @@ func NewWhere() Where {
 
 // ParseWhere create a new Where based on string input.
 // This function should be called to initiate the Where field.
-func ParseWhere(str string, args ...interface{}) Where {
+func ParseWhere(str string, args ...any) Where {
 	out := &where{}
 	return out.And(str, args...)
 }
@@ -42,16 +42,16 @@ func MakeWhere(f func(w Where)) Where {
 // Where clause for the SQL query.
 type Where interface {
 	// Args return the arguments of the where.
-	Args() []interface{}
+	Args() []any
 
 	// String convert Where to string.
 	String() string
 
 	// And add a new condition "AND".
-	And(str string, args ...interface{}) Where
+	And(str string, args ...any) Where
 
 	// AndIf a new condition "AND" if args is Valid & and not Zero.
-	AndIf(str string, arg interface{}) Where
+	AndIf(str string, arg any) Where
 
 	// AndIn add a new condition "AND" with the operator IN.
 	AndIn(col string, s Slicer) Where
@@ -64,10 +64,10 @@ type Where interface {
 	AndWhere(in ...Where) Where
 
 	// Or add a new condition "OR".
-	Or(str string, args ...interface{}) Where
+	Or(str string, args ...any) Where
 
 	// OrIf a new condition "or" if args is Valid & and not Zero.
-	OrIf(str string, arg interface{}) Where
+	OrIf(str string, arg any) Where
 
 	// OrIn add a new condition "OR" with the operator IN.
 	OrIn(col string, s Slicer) Where
@@ -85,10 +85,10 @@ type Where interface {
 
 type where struct {
 	str  strings.Builder
-	args []interface{}
+	args []any
 }
 
-func (w *where) Args() []interface{} {
+func (w *where) Args() []any {
 	return w.args
 }
 
@@ -96,7 +96,7 @@ func (w *where) String() string {
 	return w.str.String()
 }
 
-func (w *where) And(str string, args ...interface{}) Where {
+func (w *where) And(str string, args ...any) Where {
 	if w.str.Len() > 0 {
 		w.str.WriteString(andKeyword)
 	}
@@ -106,7 +106,7 @@ func (w *where) And(str string, args ...interface{}) Where {
 	return w
 }
 
-func (w *where) AndIf(str string, arg interface{}) Where {
+func (w *where) AndIf(str string, arg any) Where {
 	if !reflect.ValueOf(arg).IsZero() {
 		w.And(str, arg)
 	}
@@ -137,7 +137,7 @@ func (w *where) AndWhere(in ...Where) Where {
 	return w
 }
 
-func (w *where) Or(str string, args ...interface{}) Where {
+func (w *where) Or(str string, args ...any) Where {
 	if w.str.Len() > 0 {
 		w.str.WriteString(orKeyword)
 	}
@@ -147,7 +147,7 @@ func (w *where) Or(str string, args ...interface{}) Where {
 	return w
 }
 
-func (w *where) OrIf(str string, arg interface{}) Where {
+func (w *where) OrIf(str string, arg any) Where {
 	if !reflect.ValueOf(arg).IsZero() {
 		w.Or(str, arg)
 	}

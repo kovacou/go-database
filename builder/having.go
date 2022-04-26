@@ -16,7 +16,7 @@ func NewHaving() Having {
 
 // ParseHaving create a new Having based on string input.
 // This function should be called to initiate the Having field.
-func ParseHaving(str string, args ...interface{}) Having {
+func ParseHaving(str string, args ...any) Having {
 	out := &where{}
 	return out.And(str, args...)
 }

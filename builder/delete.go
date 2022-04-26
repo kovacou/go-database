@@ -34,7 +34,7 @@ func (d *Delete) String() string {
 }
 
 // Args compute the arguments of the delete statement.
-func (d *Delete) Args() (out []interface{}) {
+func (d *Delete) Args() (out []any) {
 	if d.Where != nil {
 		out = d.Where.Args()
 	}
