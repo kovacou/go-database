@@ -10,12 +10,17 @@ import (
 )
 
 // NewQuery create a new Query based on string input.
-func NewQuery(str string, args []any) *Query {
+func NewQuery(str string, args ...any) *Query {
 	q := &Query{
 		args: args,
 	}
 	q.str.WriteString(str)
 	return q
+}
+
+// ParseQuery create a new Query based on string input.
+func ParseQuery(str string, args ...any) *Query {
+	return NewQuery(str, args...)
 }
 
 // Query is the representation of an Query statement.

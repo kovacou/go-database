@@ -110,7 +110,6 @@ func (w *where) AndIf(str string, arg any) Where {
 	if !reflect.ValueOf(arg).IsZero() {
 		w.And(str, arg)
 	}
-
 	return w
 }
 

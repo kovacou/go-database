@@ -10,13 +10,16 @@ import (
 	"database/sql"
 )
 
+// IsolationLevel is the default isolation level
+var IsolationLevel sql.IsolationLevel = sql.LevelDefault
+
 // TxFunc handler.
 type TxFunc func(Connection) error
 
 // Tx copy the client and create a new transaction.
 func (conn *db) Tx(level ...sql.IsolationLevel) (Connection, error) {
 	var err error
-	isolationLevel := sql.LevelDefault
+	isolationLevel := IsolationLevel
 	if len(level) > 0 {
 		isolationLevel = level[0]
 	}
@@ -39,15 +42,15 @@ func (conn *db) Tx(level ...sql.IsolationLevel) (Connection, error) {
 }
 
 // RunTx run a bunch of TxFunc and handle the commit & rollback.
-func (conn *db) RunTx(funcs ...TxFunc) (err error) {
-	tx, err := conn.Tx()
+func (conn *db) RunTx(level sql.IsolationLevel, funcs ...TxFunc) (err error) {
+	tx, err := conn.Tx(level)
 	if err != nil {
 		return
 	}
 
 	for _, f := range funcs {
 		if err = f(tx); err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return
 		}
 	}

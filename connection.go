@@ -77,7 +77,7 @@ type (
 		Tx(...sql.IsolationLevel) (Connection, error)
 		Commit() error
 		Rollback() error
-		RunTx(...TxFunc) error
+		RunTx(sql.IsolationLevel, ...TxFunc) error
 	}
 )
 
