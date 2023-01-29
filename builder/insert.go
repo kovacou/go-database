@@ -18,6 +18,18 @@ const (
 	onDuplicateKeyUpdateKeyword = " ON DUPLICATE KEY UPDATE "
 )
 
+// NewInsert create a new insert.
+func NewInsert(t string) *Insert {
+	return &Insert{
+		Table:           t,
+		Select:          Select{},
+		Values:          H{},
+		keys:            Keys{},
+		OnUpdateKeys:    Keys{},
+		OnUpdateRawKeys: RawKeys{},
+	}
+}
+
 // Insert is the representation of an Insert statement.
 type Insert struct {
 	Table           string

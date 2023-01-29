@@ -15,6 +15,17 @@ const (
 	setKeyword    = " SET "
 )
 
+// NewUpdate create a new update.
+func NewUpdate(t string) *Update {
+	return &Update{
+		Table:  t,
+		Values: H{},
+		Binds:  Binds{},
+		Joins:  Joins{},
+		Where:  NewWhere(),
+	}
+}
+
 // Update is the representation of an Update statement.
 type Update struct {
 	Table  string

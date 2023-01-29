@@ -13,6 +13,14 @@ const (
 	deleteKeyword = "DELETE "
 )
 
+// NewDelete create a new delete.
+func NewDelete(t string) *Delete {
+	return &Delete{
+		Table: t,
+		Where: NewWhere(),
+	}
+}
+
 // Delete is the representation of an Delete statement.
 type Delete struct {
 	Table string

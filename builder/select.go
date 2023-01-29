@@ -15,6 +15,19 @@ const (
 	fromKeyword   = " FROM "
 )
 
+// NewSelect create a new select.
+func NewSelect(t string) *Select {
+	return &Select{
+		Table:   t,
+		Columns: NewColumns(),
+		Joins:   Joins{},
+		Where:   NewWhere(),
+		GroupBy: NewGroupBy(),
+		OrderBy: NewOrderBy(),
+		Having:  NewHaving(),
+	}
+}
+
 // Select is the representation of the Select statement.
 type Select struct {
 	Table   string
