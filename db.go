@@ -87,7 +87,7 @@ func (conn *db) Close() (err error) {
 		conn.ctx.Done()
 	}
 
-	if dbx := (*conn.dbx); dbx != nil {
+	if dbx := *conn.dbx; dbx != nil {
 		err = dbx.Close()
 	}
 	return
@@ -125,7 +125,7 @@ func (conn *db) Connect() (err error) {
 		return
 	}
 
-	(*conn.dbx), err = sqlx.Connect(
+	*conn.dbx, err = sqlx.Connect(
 		conn.env.Driver,
 		conn.env.String(),
 	)
@@ -135,10 +135,11 @@ func (conn *db) Connect() (err error) {
 		return
 	}
 
-	dbx := (*conn.dbx)
+	dbx := *conn.dbx
 	dbx.SetMaxIdleConns(conn.env.MaxIdle)
 	dbx.SetMaxOpenConns(conn.env.MaxOpen)
 	dbx.SetConnMaxLifetime(conn.env.MaxLifetime)
+	dbx.SetConnMaxIdleTime(conn.env.MaxLifetime)
 
 	if conn.env.ProfilerEnable {
 		conn.m.Lock()
