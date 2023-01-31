@@ -51,6 +51,7 @@ type (
 		MustPing()
 		Close() error
 		SetLogger(out *log.Logger, err *log.Logger)
+		Tables() []string
 
 		// Statements
 		Exec(Stmt) (sql.Result, error)

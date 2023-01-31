@@ -13,6 +13,7 @@ import (
 	// Loading mysql driver by default.
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"github.com/kovacou/go-database/builder"
 )
 
 // db is a wrapper around sqlx.DB.
@@ -159,7 +160,17 @@ func (conn *db) Connect() (err error) {
 	return
 }
 
-// LastError
+// Tables fetch tables of the current schema
+func (conn *db) Tables() (t []string) {
+	if conn.env.Driver == "mysql" {
+		_, _ = conn.SelectSlice(builder.NewQuery("SHOW TABLES"), func(v []any) {
+			t = append(t, string(v[0].([]uint8)))
+		})
+	}
+	return t
+}
+
+// LastError return the last error that occured.
 func (conn *db) LastError() error {
 	return conn.err
 }
