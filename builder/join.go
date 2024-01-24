@@ -10,6 +10,38 @@ import (
 	"strings"
 )
 
+// ParseJoin create a new Join.
+func ParseJoin(t string, on On) Join {
+	return Join{
+		Table: t,
+		On:    on,
+	}
+}
+
+// ParseLeftJoin create a new left Join.
+func ParseLeftJoin(t string, on On) Join {
+	return Join{
+		Table: t,
+		Type:  "LEFT",
+		On:    on,
+	}
+}
+
+// NewJoin create a new Join.
+func NewJoin() Join {
+	return Join{
+		On: NewOn(),
+	}
+}
+
+// NewLeftJoin create a new left Join.
+func NewLeftJoin() Join {
+	return Join{
+		Type: "LEFT",
+		On:   NewOn(),
+	}
+}
+
 // Joins is a slice of Join.
 type Joins []Join
 

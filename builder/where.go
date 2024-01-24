@@ -108,7 +108,11 @@ func (w *where) And(str string, args ...any) Where {
 
 func (w *where) AndIf(str string, arg any) Where {
 	if !reflect.ValueOf(arg).IsZero() {
-		w.And(str, arg)
+		if strings.Contains(str, "?") {
+			w.And(str, arg)
+		} else {
+			w.And(str)
+		}
 	}
 	return w
 }
@@ -148,9 +152,12 @@ func (w *where) Or(str string, args ...any) Where {
 
 func (w *where) OrIf(str string, arg any) Where {
 	if !reflect.ValueOf(arg).IsZero() {
-		w.Or(str, arg)
+		if strings.Contains(str, "?") {
+			w.Or(str, arg)
+		} else {
+			w.Or(str)
+		}
 	}
-
 	return w
 }
 

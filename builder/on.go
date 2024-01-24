@@ -14,7 +14,7 @@ func NewOn() On {
 	return &where{}
 }
 
-// ParseOn create a new Having based on string input.
+// ParseOn create a new Where based on string input.
 // This function should be called to initiate the On field from Join.
 func ParseOn(str string, args ...any) On {
 	out := &where{}
