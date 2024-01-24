@@ -89,7 +89,7 @@ func Close() {
 	defer m.Unlock()
 	for _, dbx := range cp {
 		if dbx != nil {
-			dbx.Close()
+			_ = dbx.Close()
 		}
 	}
 }
@@ -173,6 +173,7 @@ func open(e *Environment, once bool, env string, dbx *sqlx.DB, logger []*log.Log
 
 		m.Unlock()
 	}
+
 	conn.id, conn.dbx = createNewConnection(once, cfg.Alias)
 
 	if conn.hasVerbose() {
