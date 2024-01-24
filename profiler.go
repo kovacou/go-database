@@ -7,7 +7,6 @@ package database
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -33,7 +32,7 @@ type profiler struct {
 func (p *profiler) write(filename string, body []byte) error {
 	filename = path.Clean(filename)
 	os.MkdirAll(filepath.Dir(filename), os.ModePerm)
-	return ioutil.WriteFile(filename, body, os.ModePerm)
+	return os.WriteFile(filename, body, os.ModePerm)
 }
 
 // Push a new profile into the profiler.

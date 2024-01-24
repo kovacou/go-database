@@ -8,6 +8,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -26,7 +27,7 @@ func (conn *db) SelectMap(stmt Stmt, mapper MapMapper) (rowsReturned int, err er
 	return conn.runMap(stmt, mapper)
 }
 
-// SelectMap run an SELECT query to fetch a single result using a map mapper.
+// SelectMapRow run an SELECT query to fetch a single result using a map mapper.
 func (conn *db) SelectMapRow(stmt Stmt, mapper MapMapper) (rowsReturned int, err error) {
 	return conn.runMapRow(stmt, mapper)
 }
@@ -62,24 +63,24 @@ func (conn *db) Exec(stmt Stmt) (res sql.Result, err error) {
 	return
 }
 
-// QuerySlice run an SELECT query to fetch a single result using a slice mapper.
+// QuerySlice run an SELECT query to fetch a multiple results using a slice mapper.
 func (conn *db) QuerySlice(query string, mapper SliceMapper, args ...any) (rowsReturned int, err error) {
-	return conn.runSlice(builder.NewQuery(query, args), mapper)
+	return conn.runSlice(builder.NewQuery(query, args...), mapper)
 }
 
-// QuerySliceRow run an SELECT query to fetch multiple results using a slice mapper.
+// QuerySliceRow run an SELECT query to fetch a single result using a slice mapper.
 func (conn *db) QuerySliceRow(query string, mapper SliceMapper, args ...any) (rowsReturned int, err error) {
-	return conn.runSliceRow(builder.NewQuery(query, args), mapper)
+	return conn.runSliceRow(builder.NewQuery(query, args...), mapper)
 }
 
 // QueryMap run an SELECT query to fetch multiple results using a map mapper.
 func (conn *db) QueryMap(query string, mapper MapMapper, args ...any) (rowsReturned int, err error) {
-	return conn.runMap(builder.NewQuery(query, args), mapper)
+	return conn.runMap(builder.NewQuery(query, args...), mapper)
 }
 
 // QueryMapRow run an SELECT query to fetch a single result using a map mapper.
 func (conn *db) QueryMapRow(query string, mapper MapMapper, args ...any) (rowsReturned int, err error) {
-	return conn.runMapRow(builder.NewQuery(query, args), mapper)
+	return conn.runMapRow(builder.NewQuery(query, args...), mapper)
 }
 
 // runMap run stmt with a multiple results expected and mapped with a MapMapper.
@@ -263,6 +264,11 @@ func preparex(conn *db, stmt Stmt) (*sqlx.Stmt, error) {
 
 // profilingStmt store into the context the Stmt and store
 func (conn *db) profilingStmt(stmt Stmt, err error, t time.Time) {
+	if err != nil {
+		fmt.Println("Erreur", err.Error())
+		fmt.Println("Stmt", stmt.String())
+	}
+
 	if !conn.hasProfiling() {
 		return
 	}
